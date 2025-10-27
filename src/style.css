@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom styles for a cleaner look */
+.calendar-day {
+  @apply relative flex flex-col items-center justify-center p-2 h-24 rounded-lg shadow-md transition-all duration-200 cursor-pointer;
+  @apply bg-gray-800 border border-gray-700;
+}
+
+.calendar-day:hover {
+  @apply bg-gray-700 ring-2 ring-indigo-500;
+}
+
+.calendar-day.today {
+  @apply bg-indigo-800 text-white font-bold border-indigo-600;
+}
+
+.calendar-day.selected {
+  @apply ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-400 bg-gray-700;
+}
+
+.workout-marker {
+  @apply absolute bottom-2 left-2 right-2 h-1.5 rounded-full;
+}
+
+.workout-push { @apply bg-red-500; }
+.workout-pull { @apply bg-blue-500; }
+.workout-legs { @apply bg-green-500; }
+.workout-rest { @apply bg-gray-500; }
+
+/* Custom Modal */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black/75 flex items-center justify-center z-50 transition-opacity duration-300;
+}
+
+.modal-content {
+  @apply bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-95;
+}
+
+.modal-hidden {
+  @apply opacity-0 pointer-events-none;
+}
+
+.modal-visible {
+  @apply opacity-100 scale-100;
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply w-12 h-12 border-4 border-t-indigo-500 border-gray-600 rounded-full animate-spin;
+}
+
+/* Helper for hiding elements */
+.hidden {
+  display: none;
+}
