@@ -37,10 +37,18 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
   };
 
   const getMonthYearHeader = (date: Date) => {
-    return date.toLocaleDateString(undefined, { 
-      month: 'long', 
-      year: 'numeric' 
-    });
+    const startOfWeek = getWeekStartDate(date);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    
+    const startMonth = startOfWeek.toLocaleDateString('en-US', { month: 'short' });
+    const endMonth = endOfWeek.toLocaleDateString('en-US', { month: 'short' });
+    const year = startOfWeek.toLocaleDateString('en-US', { year: 'numeric' });
+
+    if (startMonth === endMonth) {
+      return `${startMonth} ${year}`;
+    }
+    return `${startMonth} - ${endMonth} ${year}`;
   };
 
   const isToday = (date: Date) => {
@@ -69,22 +77,22 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
   const weekStart = getWeekStartDate(currentDate);
 
   return (
-    <div>
+    <div className="calendar-container">
       {/* Week Navigation */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <button 
           onClick={() => changeWeek(-7)}
-          className="btn-ios-stepper" 
+          className="btn-ios-stepper w-10 h-10" 
           aria-label="Previous week"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-base sm:text-lg font-semibold text-white">
+        <h2 className="text-lg sm:text-xl font-semibold text-white text-center">
           Week of {getMonthYearHeader(currentDate)}
         </h2>
         <button 
           onClick={() => changeWeek(7)}
-          className="btn-ios-stepper"
+          className="btn-ios-stepper w-10 h-10"
           aria-label="Next week"
         >
           <ChevronRight className="w-5 h-5" />
@@ -93,13 +101,13 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
       
       <button 
         onClick={goToToday}
-        className="w-full mb-4 py-2 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-all"
+        className="w-full mb-6 py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-all"
       >
         Go to Today
       </button>
       
-      {/* Day grid - scrollable on small screens */}
-      <div className="grid grid-cols-7 gap-1 sm:gap-2 overflow-x-auto">
+      {/* Day grid - improved spacing and sizing */}
+      <div className="grid grid-cols-7 gap-2 sm:gap-3">
         {Array.from({ length: 7 }, (_, i) => {
           const dayDate = new Date(weekStart);
           dayDate.setDate(weekStart.getDate() + i);
@@ -110,10 +118,10 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
           const workoutData = workouts[dateString];
           
           return (
-            <div key={dateString}>
+            <div key={dateString} className="flex flex-col">
               <div
                 onClick={() => handleDayClick(dateString)}
-                className={`calendar-day min-w-[48px] sm:min-w-[64px] ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
+                className={`calendar-day ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -124,19 +132,21 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
                 }}
                 aria-label={`${dayName} ${dateNum}${workoutData ? ` - ${workoutData.workoutType} workout` : ''}`}
               >
-                <span className="text-xs sm:text-sm font-medium text-gray-400">{dayName}</span>
-                <span className="text-lg sm:text-2xl font-bold mt-1">{dateNum}</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-400 mb-1">{dayName}</span>
+                <span className="text-xl sm:text-2xl font-bold text-white">{dateNum}</span>
                 {workoutData && (
                   <div className={`workout-marker workout-${workoutData.workoutType.toLowerCase()}`}></div>
                 )}
               </div>
               
               {expandedDate === dateString && (
-                <InlineWorkoutPanel 
-                  date={dateString}
-                  existingWorkout={workoutData}
-                  onClose={() => setExpandedDate(null)}
-                />
+                <div className="mt-3">
+                  <InlineWorkoutPanel 
+                    date={dateString}
+                    existingWorkout={workoutData}
+                    onClose={() => setExpandedDate(null)}
+                  />
+                </div>
               )}
             </div>
           );

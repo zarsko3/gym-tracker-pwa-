@@ -38,29 +38,52 @@ body {
 
 /* iOS-optimized component styles */
 
-/* Calendar day cells - iPhone optimized */
+/* Calendar container */
+.calendar-container {
+    @apply w-full;
+}
+
+/* Calendar day cells - improved spacing and readability */
 .calendar-day {
     @apply relative flex flex-col items-center justify-center rounded-xl shadow-sm transition-all duration-200 cursor-pointer;
     @apply bg-gray-800 border border-gray-700;
-    min-height: 44px; /* iOS minimum tap target */
-    padding: 8px 4px;
-    margin: 2px;
+    min-height: 64px; /* Increased from 44px for better touch targets */
+    padding: 12px 8px; /* Increased padding for better spacing */
+    margin: 0; /* Remove margin to use grid gap instead */
+    aspect-ratio: 1; /* Make cells square */
+}
+
+/* Responsive calendar day sizing */
+@media (max-width: 390px) {
+    .calendar-day {
+        min-height: 56px;
+        padding: 8px 4px;
+    }
+}
+
+@media (min-width: 768px) {
+    .calendar-day {
+        min-height: 72px;
+        padding: 16px 12px;
+    }
 }
 
 .calendar-day:hover {
-    @apply bg-gray-700 ring-2 ring-indigo-500;
+    @apply bg-gray-700 ring-2 ring-indigo-500 transform scale-105;
 }
 
 .calendar-day.today {
-    @apply bg-indigo-800 text-white font-semibold border-indigo-600;
+    @apply bg-indigo-600 text-white font-semibold border-indigo-500 shadow-lg;
 }
 
 .calendar-day.selected {
-    @apply ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-400 bg-gray-700;
+    @apply ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-400 bg-gray-700 transform scale-105;
 }
 
+/* Workout markers - more visible and better positioned */
 .workout-marker {
-  @apply absolute bottom-2 left-2 right-2 h-1.5 rounded-full;
+    @apply absolute bottom-2 left-2 right-2 h-2 rounded-full;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .workout-push { @apply bg-red-500; }

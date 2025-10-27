@@ -83,10 +83,10 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="container-responsive py-4 md:py-6 lg:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Calendar - full width on mobile, 2/3 on tablet, 1/2 on desktop */}
           <div className="col-span-1 md:col-span-2 lg:col-span-2">
-            <div className="bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
+            <div className="bg-gray-800 rounded-lg shadow-xl p-6 md:p-8">
               <Calendar workouts={workouts} />
             </div>
           </div>
