@@ -174,11 +174,11 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
   };
 
   return (
-    <div className="bg-gray-700 rounded-lg p-4 shadow-inner">
+    <div className="bg-gray-700 rounded-lg p-3 sm:p-4 shadow-inner">
       <div className="flex justify-between items-center mb-3">
         <div>
-          <h4 className="text-lg font-semibold text-white">{exercise.name}</h4>
-          <p className="text-sm text-indigo-300 -mt-1">
+          <h4 className="text-base sm:text-lg font-semibold text-white">{exercise.name}</h4>
+          <p className="text-xs sm:text-sm text-indigo-300 -mt-1">
             Vol: {calculateVolume().toLocaleString()}kg
             {saving && <span className="ml-2 text-yellow-400">Saving...</span>}
             {lastSaved && !saving && (
@@ -190,14 +190,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
         </div>
         <button
           onClick={addSet}
-          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm font-medium transition-all touch-target"
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm font-medium transition-all btn-ios"
         >
           <Plus className="w-4 h-4 mr-1" />
           Add Set
         </button>
       </div>
       
-      <p className="text-sm text-indigo-300 mb-3">{lastWorkoutStats}</p>
+      <p className="text-xs sm:text-sm text-indigo-300 mb-3">{lastWorkoutStats}</p>
       
       <div className="space-y-3">
         {exercise.sets.map((set, index) => (
@@ -207,7 +207,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => markSetComplete(index)}
-                  className={`btn-ios-stepper rounded-full ${
+                  className={`btn-ios-stepper rounded-full w-12 h-12 sm:w-11 sm:h-11 ${
                     set.completed 
                       ? 'set-complete' 
                       : 'set-incomplete'
@@ -218,7 +218,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                 </button>
                 <button
                   onClick={() => removeSet(index)}
-                  className="text-gray-400 hover:text-red-500 transition-all p-1 touch-target"
+                  className="text-gray-400 hover:text-red-500 transition-all p-1 btn-ios-stepper w-12 h-12 sm:w-11 sm:h-11"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -232,7 +232,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => adjustWeight(index, -5)}
-                    className="btn-ios-stepper"
+                    className="btn-ios-stepper w-12 h-12 sm:w-11 sm:h-11"
                     aria-label="Decrease weight by 5kg"
                   >
                     -5
@@ -241,14 +241,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                     type="number"
                     value={set.weight || ''}
                     onChange={(e) => updateSet(index, 'weight', parseFloat(e.target.value) || 0)}
-                    className="input-ios flex-1"
+                    className="input-ios flex-1 text-xl sm:text-lg h-12 sm:h-11"
                     placeholder="0"
                     inputMode="numeric"
                     aria-label="Weight in kilograms"
                   />
                   <button
                     onClick={() => adjustWeight(index, 5)}
-                    className="btn-ios-stepper"
+                    className="btn-ios-stepper w-12 h-12 sm:w-11 sm:h-11"
                     aria-label="Increase weight by 5kg"
                   >
                     +5
@@ -262,7 +262,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => adjustReps(index, -1)}
-                    className="btn-ios-stepper"
+                    className="btn-ios-stepper w-12 h-12 sm:w-11 sm:h-11"
                     aria-label="Decrease reps by 1"
                   >
                     <Minus className="w-4 h-4 mx-auto" />
@@ -271,14 +271,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                     type="number"
                     value={set.reps || ''}
                     onChange={(e) => updateSet(index, 'reps', parseInt(e.target.value) || 0)}
-                    className="input-ios flex-1"
+                    className="input-ios flex-1 text-xl sm:text-lg h-12 sm:h-11"
                     placeholder="0"
                     inputMode="numeric"
                     aria-label="Number of repetitions"
                   />
                   <button
                     onClick={() => adjustReps(index, 1)}
-                    className="btn-ios-stepper"
+                    className="btn-ios-stepper w-12 h-12 sm:w-11 sm:h-11"
                     aria-label="Increase reps by 1"
                   >
                     <Plus className="w-4 h-4 mx-auto" />

@@ -82,44 +82,50 @@ const Dashboard: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Calendar Section */}
-          <div className="bg-gray-800 rounded-lg shadow-xl p-6">
-            <Calendar workouts={workouts} />
+      <main className="container-responsive py-4 md:py-6 lg:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Calendar - full width on mobile, 2/3 on tablet, 1/2 on desktop */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-2">
+            <div className="bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
+              <Calendar workouts={workouts} />
+            </div>
+          </div>
+          
+          {/* Stats sidebar - stacked on mobile, sidebar on tablet+ */}
+          <div className="col-span-1 space-y-4">
+            <DashboardStats workouts={workouts} />
+            <div className="bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
+              <h2 className="text-lg md:text-xl font-semibold text-white mb-4">Exercise Progress</h2>
+              <ProgressChart workouts={workouts} />
+            </div>
           </div>
 
-          {/* Dashboard Stats */}
-          <DashboardStats workouts={workouts} />
-
-          {/* Progress Chart */}
-          <div className="bg-gray-800 rounded-lg shadow-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Exercise Progress</h2>
-            <ProgressChart workouts={workouts} />
+          {/* Volume Chart - full width on mobile, spans both columns on tablet+ */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3">
+            <VolumeChart workouts={workouts} />
           </div>
 
-          {/* Volume Chart */}
-          <VolumeChart workouts={workouts} />
-
-          {/* Workout Legend */}
-          <div className="bg-gray-800 rounded-lg shadow-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Workout Legend</h3>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center">
-                <span className="w-4 h-4 rounded-full bg-red-500 mr-2"></span>
-                Push
-              </div>
-              <div className="flex items-center">
-                <span className="w-4 h-4 rounded-full bg-blue-500 mr-2"></span>
-                Pull
-              </div>
-              <div className="flex items-center">
-                <span className="w-4 h-4 rounded-full bg-green-500 mr-2"></span>
-                Legs
-              </div>
-              <div className="flex items-center">
-                <span className="w-4 h-4 rounded-full bg-gray-500 mr-2"></span>
-                Rest
+          {/* Workout Legend - full width on mobile, spans both columns on tablet+ */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3">
+            <div className="bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
+              <h3 className="text-lg font-semibold mb-4">Workout Legend</h3>
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-red-500 mr-2"></span>
+                  Push
+                </div>
+                <div className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-blue-500 mr-2"></span>
+                  Pull
+                </div>
+                <div className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-green-500 mr-2"></span>
+                  Legs
+                </div>
+                <div className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-gray-500 mr-2"></span>
+                  Rest
+                </div>
               </div>
             </div>
           </div>

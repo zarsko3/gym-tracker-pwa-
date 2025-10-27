@@ -120,267 +120,281 @@ const InlineWorkoutPanel: React.FC<InlineWorkoutPanelProps> = ({
   const totalSets = calculateTotalSets(exercises);
 
   return (
-    <div className="mt-4 bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-700 animate-slide-down">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-white">
-          {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            month: 'short', 
-            day: 'numeric' 
-          })}
-        </h3>
+    <div className="mt-4 bg-gray-800 rounded-lg shadow-lg border border-gray-700 animate-slide-down">
+      {/* Header at top - informational */}
+      <div className="p-4 border-b border-gray-700">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-white">
+            {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              month: 'short', 
+              day: 'numeric' 
+            })}
+          </h3>
+          <div className="timer-display">{workoutTimer.formattedTime}</div>
+        </div>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+          className="absolute top-4 right-4 p-2 hover:bg-gray-700 rounded-lg transition-colors"
         >
           <X className="w-5 h-5 text-gray-400" />
         </button>
       </div>
 
-      {/* Timer Section */}
-      {selectedType && selectedType !== 'Rest' && (
-        <div className="mb-4 p-3 bg-gray-700 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-indigo-400" />
-              <span className="text-sm font-medium text-gray-300">Workout Timer</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {!workoutTimer.isActive ? (
-                <button
-                  onClick={handleStartWorkout}
-                  className="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
-                >
-                  <Play className="w-4 h-4" />
-                  Start
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={workoutTimer.pause}
-                    className="p-1 hover:bg-gray-600 rounded transition-colors"
-                  >
-                    <Pause className="w-4 h-4 text-gray-400" />
-                  </button>
-                  <button
-                    onClick={workoutTimer.stop}
-                    className="p-1 hover:bg-gray-600 rounded transition-colors"
-                  >
-                    <Square className="w-4 h-4 text-gray-400" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="text-2xl font-mono font-bold text-indigo-400">
-            {workoutTimer.formattedTime}
-          </div>
-        </div>
-      )}
-
-      {/* Rest Timer */}
-      {restTimer.isActive && (
-        <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-400" />
-              <span className="text-sm font-medium text-blue-300">Rest Time</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={restTimer.pause}
-                className="p-1 hover:bg-blue-800/50 rounded transition-colors"
-              >
-                <Pause className="w-4 h-4 text-blue-400" />
-              </button>
-              <button
-                onClick={restTimer.skip}
-                className="p-1 hover:bg-blue-800/50 rounded transition-colors"
-              >
-                <X className="w-4 h-4 text-blue-400" />
-              </button>
-            </div>
-          </div>
-          <div className="text-2xl font-mono font-bold text-blue-400">
-            {restTimer.formattedTime}
-          </div>
-        </div>
-      )}
-
-      {/* Workout Type Selector */}
-      {!selectedType && (
-        <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-300 mb-2">Select Workout Type</h4>
-          <div className="grid grid-cols-2 gap-3">
-            {WORKOUT_TYPES.map(type => (
-              <button
-                key={type}
-                onClick={() => handleWorkoutTypeSelect(type)}
-                className={`btn-ios ${
-                  type === 'Push' ? 'bg-red-600 hover:bg-red-700 active:bg-red-800' :
-                  type === 'Pull' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' :
-                  type === 'Legs' ? 'bg-green-600 hover:bg-green-700 active:bg-green-800' :
-                  'bg-gray-600 hover:bg-gray-700 active:bg-gray-800'
-                }`}
-                aria-label={`Select ${type} workout`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Workout Summary */}
-      {selectedType && selectedType !== 'Rest' && (
-        <div className="mb-4 p-3 bg-gray-700 rounded-lg">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-white">{totalVolume.toLocaleString()}</div>
-              <div className="text-xs text-gray-400">Total Volume (kg)</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-white">{setsCompleted}/{totalSets}</div>
-              <div className="text-xs text-gray-400">Sets Complete</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-white">{exercises.length}</div>
-              <div className="text-xs text-gray-400">Exercises</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Exercise List */}
-      {selectedType && selectedType !== 'Rest' && (
-        <div className="space-y-3">
-          {exercises.map((exercise, index) => (
-            <div key={index} className="bg-gray-700 rounded-lg p-3">
-              <div className="flex justify-between items-center mb-2">
-                <h5 className="font-medium text-white">{exercise.name}</h5>
-                <div className="text-sm text-gray-400">
-                  {exercise.sets.filter(s => s.completed).length}/{exercise.sets.length} sets
-                </div>
+      {/* Scrollable content area */}
+      <div className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+        {/* Timer Section */}
+        {selectedType && selectedType !== 'Rest' && (
+          <div className="p-3 bg-gray-700 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-indigo-400" />
+                <span className="text-sm font-medium text-gray-300">Workout Timer</span>
               </div>
-              
-              <div className="space-y-2">
-                {exercise.sets.map((set, setIndex) => (
-                  <div key={setIndex} className="flex items-center gap-2">
-                    <div className="flex-1 flex items-center gap-2">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            const newSets = [...exercise.sets];
-                            newSets[setIndex] = { ...set, weight: Math.max(0, set.weight - 5) };
-                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                          }}
-                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
-                        >
-                          -5
-                        </button>
-                        <input
-                          type="number"
-                          value={set.weight || ''}
-                          onChange={(e) => {
-                            const newSets = [...exercise.sets];
-                            newSets[setIndex] = { ...set, weight: Number(e.target.value) || 0 };
-                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                          }}
-                          className="w-16 h-8 bg-gray-800 text-white text-center rounded font-bold"
-                          placeholder="0"
-                        />
-                        <button
-                          onClick={() => {
-                            const newSets = [...exercise.sets];
-                            newSets[setIndex] = { ...set, weight: set.weight + 5 };
-                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                          }}
-                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
-                        >
-                          +5
-                        </button>
-                      </div>
-                      
-                      <span className="text-gray-400">×</span>
-                      
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            const newSets = [...exercise.sets];
-                            newSets[setIndex] = { ...set, reps: Math.max(0, set.reps - 1) };
-                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                          }}
-                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          value={set.reps || ''}
-                          onChange={(e) => {
-                            const newSets = [...exercise.sets];
-                            newSets[setIndex] = { ...set, reps: Number(e.target.value) || 0 };
-                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                          }}
-                          className="w-16 h-8 bg-gray-800 text-white text-center rounded font-bold"
-                          placeholder="0"
-                        />
-                        <button
-                          onClick={() => {
-                            const newSets = [...exercise.sets];
-                            newSets[setIndex] = { ...set, reps: set.reps + 1 };
-                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                          }}
-                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    
+              <div className="flex items-center gap-2">
+                {!workoutTimer.isActive ? (
+                  <button
+                    onClick={handleStartWorkout}
+                    className="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Play className="w-4 h-4" />
+                    Start
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => {
-                        const newSets = [...exercise.sets];
-                        newSets[setIndex] = { ...set, completed: !set.completed };
-                        handleExerciseUpdate(index, { ...exercise, sets: newSets });
-                        if (!set.completed) {
-                          handleSetComplete();
-                        }
-                      }}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                        set.completed 
-                          ? 'bg-green-600 text-white' 
-                          : 'bg-gray-600 hover:bg-gray-500 text-gray-400'
-                      }`}
+                      onClick={workoutTimer.pause}
+                      className="p-1 hover:bg-gray-600 rounded transition-colors"
                     >
-                      {set.completed ? <CheckCircle className="w-5 h-5" /> : '○'}
+                      <Pause className="w-4 h-4 text-gray-400" />
+                    </button>
+                    <button
+                      onClick={workoutTimer.stop}
+                      className="p-1 hover:bg-gray-600 rounded transition-colors"
+                    >
+                      <Square className="w-4 h-4 text-gray-400" />
                     </button>
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            <div className="text-2xl font-mono font-bold text-indigo-400">
+              {workoutTimer.formattedTime}
+            </div>
+          </div>
+        )}
 
-      {/* Save Button */}
+        {/* Rest Timer */}
+        {restTimer.isActive && (
+          <div className="p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-400" />
+                <span className="text-sm font-medium text-blue-300">Rest Time</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={restTimer.pause}
+                  className="p-1 hover:bg-blue-800/50 rounded transition-colors"
+                >
+                  <Pause className="w-4 h-4 text-blue-400" />
+                </button>
+                <button
+                  onClick={restTimer.skip}
+                  className="p-1 hover:bg-blue-800/50 rounded transition-colors"
+                >
+                  <X className="w-4 h-4 text-blue-400" />
+                </button>
+              </div>
+            </div>
+            <div className="text-2xl font-mono font-bold text-blue-400">
+              {restTimer.formattedTime}
+            </div>
+          </div>
+        )}
+
+        {/* Workout Type Selector */}
+        {!selectedType && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-300 mb-2">Select Workout Type</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {WORKOUT_TYPES.map(type => (
+                <button
+                  key={type}
+                  onClick={() => handleWorkoutTypeSelect(type)}
+                  className={`btn-ios ${
+                    type === 'Push' ? 'bg-red-600 hover:bg-red-700 active:bg-red-800' :
+                    type === 'Pull' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' :
+                    type === 'Legs' ? 'bg-green-600 hover:bg-green-700 active:bg-green-800' :
+                    'bg-gray-600 hover:bg-gray-700 active:bg-gray-800'
+                  }`}
+                  aria-label={`Select ${type} workout`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Workout Summary */}
+        {selectedType && selectedType !== 'Rest' && (
+          <div className="p-3 bg-gray-700 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-white">{totalVolume.toLocaleString()}</div>
+                <div className="text-xs text-gray-400">Total Volume (kg)</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-white">{setsCompleted}/{totalSets}</div>
+                <div className="text-xs text-gray-400">Sets Complete</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-white">{exercises.length}</div>
+                <div className="text-xs text-gray-400">Exercises</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Exercise List */}
+        {selectedType && selectedType !== 'Rest' && (
+          <div className="space-y-3">
+            {exercises.map((exercise, index) => (
+              <div key={index} className="bg-gray-700 rounded-lg p-3">
+                <div className="flex justify-between items-center mb-2">
+                  <h5 className="font-medium text-white">{exercise.name}</h5>
+                  <div className="text-sm text-gray-400">
+                    {exercise.sets.filter(s => s.completed).length}/{exercise.sets.length} sets
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  {exercise.sets.map((set, setIndex) => (
+                    <div key={setIndex} className="flex items-center gap-2">
+                      <div className="flex-1 flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              const newSets = [...exercise.sets];
+                              newSets[setIndex] = { ...set, weight: Math.max(0, set.weight - 5) };
+                              handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                            }}
+                            className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                          >
+                            -5
+                          </button>
+                          <input
+                            type="number"
+                            value={set.weight || ''}
+                            onChange={(e) => {
+                              const newSets = [...exercise.sets];
+                              newSets[setIndex] = { ...set, weight: Number(e.target.value) || 0 };
+                              handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                            }}
+                            className="w-16 h-8 bg-gray-800 text-white text-center rounded font-bold"
+                            placeholder="0"
+                          />
+                          <button
+                            onClick={() => {
+                              const newSets = [...exercise.sets];
+                              newSets[setIndex] = { ...set, weight: set.weight + 5 };
+                              handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                            }}
+                            className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                          >
+                            +5
+                          </button>
+                        </div>
+                        
+                        <span className="text-gray-400">×</span>
+                        
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              const newSets = [...exercise.sets];
+                              newSets[setIndex] = { ...set, reps: Math.max(0, set.reps - 1) };
+                              handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                            }}
+                            className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            value={set.reps || ''}
+                            onChange={(e) => {
+                              const newSets = [...exercise.sets];
+                              newSets[setIndex] = { ...set, reps: Number(e.target.value) || 0 };
+                              handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                            }}
+                            className="w-16 h-8 bg-gray-800 text-white text-center rounded font-bold"
+                            placeholder="0"
+                          />
+                          <button
+                            onClick={() => {
+                              const newSets = [...exercise.sets];
+                              newSets[setIndex] = { ...set, reps: set.reps + 1 };
+                              handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                            }}
+                            className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          const newSets = [...exercise.sets];
+                          newSets[setIndex] = { ...set, completed: !set.completed };
+                          handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          if (!set.completed) {
+                            handleSetComplete();
+                          }
+                        }}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                          set.completed 
+                            ? 'bg-green-600 text-white' 
+                            : 'bg-gray-600 hover:bg-gray-500 text-gray-400'
+                        }`}
+                      >
+                        {set.completed ? <CheckCircle className="w-5 h-5" /> : '○'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {selectedType === 'Rest' && (
+          <div className="text-center py-8">
+            <div className="text-6xl mb-4">😴</div>
+            <p className="text-gray-400">Rest day logged</p>
+          </div>
+        )}
+      </div>
+
+      {/* Sticky bottom controls - thumb zone */}
       {selectedType && (
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={() => handleSaveWorkout()}
-            disabled={saving}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-          >
-            {saving ? 'Saving...' : 'Save Workout'}
-          </button>
-        </div>
-      )}
-
-      {selectedType === 'Rest' && (
-        <div className="text-center py-8">
-          <div className="text-6xl mb-4">😴</div>
-          <p className="text-gray-400">Rest day logged</p>
+        <div className="sticky bottom-0 p-4 bg-gray-800 border-t border-gray-700 pb-safe-bottom">
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleSaveWorkout()}
+              disabled={saving}
+              className="btn-ios flex-1"
+            >
+              {saving ? 'Saving...' : 'Save Workout'}
+            </button>
+            <button
+              onClick={onClose}
+              className="btn-ios-secondary"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>

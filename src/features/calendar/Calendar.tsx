@@ -70,22 +70,24 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
 
   return (
     <div>
-      {/* Calendar Header */}
-      <div className="flex justify-between items-center mb-4">
+      {/* Week Navigation */}
+      <div className="flex items-center justify-between mb-4">
         <button 
           onClick={() => changeWeek(-7)}
-          className="p-2 rounded-full hover:bg-gray-700 transition-all"
+          className="btn-ios-stepper" 
+          aria-label="Previous week"
         >
-          <ChevronLeft className="w-6 h-6 text-white" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-xl font-semibold text-white">
-          {getMonthYearHeader(currentDate)}
+        <h2 className="text-base sm:text-lg font-semibold text-white">
+          Week of {getMonthYearHeader(currentDate)}
         </h2>
         <button 
           onClick={() => changeWeek(7)}
-          className="p-2 rounded-full hover:bg-gray-700 transition-all"
+          className="btn-ios-stepper"
+          aria-label="Next week"
         >
-          <ChevronRight className="w-6 h-6 text-white" />
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
       
@@ -96,8 +98,8 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
         Go to Today
       </button>
       
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
+      {/* Day grid - scrollable on small screens */}
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 overflow-x-auto">
         {Array.from({ length: 7 }, (_, i) => {
           const dayDate = new Date(weekStart);
           dayDate.setDate(weekStart.getDate() + i);
@@ -111,7 +113,7 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
             <div key={dateString}>
               <div
                 onClick={() => handleDayClick(dateString)}
-                className={`calendar-day ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
+                className={`calendar-day min-w-[48px] sm:min-w-[64px] ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -122,8 +124,8 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
                 }}
                 aria-label={`${dayName} ${dateNum}${workoutData ? ` - ${workoutData.workoutType} workout` : ''}`}
               >
-                <span className="text-sm font-medium text-gray-400">{dayName}</span>
-                <span className="text-2xl font-bold mt-1">{dateNum}</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-400">{dayName}</span>
+                <span className="text-lg sm:text-2xl font-bold mt-1">{dateNum}</span>
                 {workoutData && (
                   <div className={`workout-marker workout-${workoutData.workoutType.toLowerCase()}`}></div>
                 )}

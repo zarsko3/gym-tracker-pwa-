@@ -1,15 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, User, Mail, Calendar } from 'lucide-react';
+import { collection, getDocs, writeBatch } from 'firebase/firestore';
+import { db } from '../../services/firebase';
+import { LogOut, User, Mail, Calendar, Trash2 } from 'lucide-react';
 
 const Profile: React.FC = () => {
   const { user, logout } = useAuth();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error('Failed to log out:', error);
+    }
+  };
+
+  const handleDeleteAllData = async () => {
+    if (confirmText !== 'DELETE ALL WORKOUTS') {
+      alert('Please type the confirmation text exactly');
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      const workoutsRef = collection(db, 'users', user!.uid, 'workouts');
+      const snapshot = await getDocs(workoutsRef);
+      
+      const batch = writeBatch(db);
+      snapshot.docs.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+      
+      alert(`Deleted ${snapshot.size} workouts`);
+      setShowDeleteConfirm(false);
+      setConfirmText('');
+    } catch (error: any) {
+      alert('Error deleting data: ' + error.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -90,6 +120,51 @@ const Profile: React.FC = () => {
                 <p>Build: PWA</p>
                 <p>Platform: Web</p>
               </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4 mt-8">
+              <h3 className="text-red-400 font-semibold mb-2 flex items-center gap-2">
+                <Trash2 className="w-5 h-5" />
+                Danger Zone
+              </h3>
+              <p className="text-sm text-gray-400 mb-4">
+                This will permanently delete all your workout data. This cannot be undone.
+              </p>
+              
+              {!showDeleteConfirm ? (
+                <button 
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="btn-ios-secondary bg-red-600 hover:bg-red-700"
+                >
+                  Delete All Workouts
+                </button>
+              ) : (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Type: DELETE ALL WORKOUTS"
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    className="input-ios w-full"
+                  />
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={handleDeleteAllData} 
+                      disabled={isDeleting}
+                      className="btn-ios bg-red-600 disabled:bg-gray-600"
+                    >
+                      {isDeleting ? 'Deleting...' : 'Confirm Delete'}
+                    </button>
+                    <button 
+                      onClick={() => setShowDeleteConfirm(false)} 
+                      className="btn-ios-secondary"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

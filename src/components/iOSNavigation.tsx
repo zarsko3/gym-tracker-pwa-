@@ -17,7 +17,7 @@ const IOSNavigation: React.FC<iOSNavigationProps> = ({ className = '' }) => {
   ];
 
   return (
-    <nav className={`bg-gray-800 border-t border-gray-700 tabbar ${className}`}>
+    <nav className={`bg-gray-800 border-t border-gray-700 tabbar lg:hidden ${className}`}>
       <div className="flex justify-around">
         {tabs.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname === path || 
