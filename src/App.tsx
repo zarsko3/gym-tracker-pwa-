@@ -10,6 +10,7 @@ import Templates from './features/templates/Templates';
 import Profile from './features/auth/Profile';
 import LoadingSpinner from './components/LoadingSpinner';
 import DataUpload from './features/admin/DataUpload';
+import IOSNavigation from './components/iOSNavigation';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -37,7 +38,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-900 text-white">
+        <div className="app bg-gray-900 text-white">
           <Routes>
             {/* Public Routes */}
             <Route 
@@ -110,6 +111,11 @@ function App() {
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
+          
+          {/* iOS Navigation - only show for authenticated users */}
+          <ProtectedRoute>
+            <IOSNavigation />
+          </ProtectedRoute>
         </div>
       </Router>
     </AuthProvider>

@@ -8,6 +8,7 @@ import DashboardStats from './DashboardStats';
 import ProgressChart from './ProgressChart';
 import VolumeChart from '../progress/VolumeChart';
 import { Calendar as CalendarIcon, BarChart3, Settings, User, Upload } from 'lucide-react';
+import IOSHeader from '../../components/iOSHeader';
 
 interface WorkoutData {
   date: string;
@@ -57,50 +58,28 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-white">Gym Tracker</h1>
-            <nav className="flex space-x-4">
-              <Link
-                to="/dashboard"
-                className="flex items-center px-3 py-2 rounded-md text-white bg-indigo-600"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" />
-                Dashboard
-              </Link>
-              <Link
-                to="/progress"
-                className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700"
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Progress
-              </Link>
-              <Link
-                to="/templates"
-                className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700"
-              >
-                Settings
-              </Link>
-              <Link
-                to="/profile"
-                className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Profile
-              </Link>
-              <Link
-                to="/upload-data"
-                className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Data
-              </Link>
-            </nav>
+      {/* iOS Header */}
+      <IOSHeader 
+        title="Gym Tracker"
+        rightAction={
+          <div className="flex items-center gap-2">
+            <Link
+              to="/progress"
+              className="btn-ios-stepper w-11 h-11"
+              aria-label="Progress"
+            >
+              <BarChart3 className="w-5 h-5" />
+            </Link>
+            <Link
+              to="/upload-data"
+              className="btn-ios-stepper w-11 h-11"
+              aria-label="Upload Data"
+            >
+              <Upload className="w-5 h-5" />
+            </Link>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

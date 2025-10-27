@@ -5,7 +5,7 @@ import { db } from '../../services/firebase';
 import { Plus, Trash2, CheckCircle, Minus } from 'lucide-react';
 import { debounce } from 'lodash-es';
 import { queueWorkoutSave, isOnline } from '../../services/offlineQueue';
-import { vibrateTap, vibrateSuccess } from '../../utils/hapticFeedback';
+import { hapticLight, hapticSuccess, hapticSelection } from '../../utils/hapticFeedback';
 
 interface Set {
   reps: number;
@@ -132,7 +132,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
   };
 
   const adjustWeight = (index: number, adjustment: number) => {
-    vibrateTap();
+    hapticSelection();
     const newSets = [...exercise.sets];
     newSets[index] = { 
       ...newSets[index], 
@@ -143,7 +143,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
   };
 
   const adjustReps = (index: number, adjustment: number) => {
-    vibrateTap();
+    hapticSelection();
     const newSets = [...exercise.sets];
     newSets[index] = { 
       ...newSets[index], 
@@ -159,9 +159,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
     newSets[index] = { ...newSets[index], completed: !wasCompleted };
     
     if (!wasCompleted) {
-      vibrateSuccess(); // Success feedback when completing a set
+      hapticSuccess(); // Success feedback when completing a set
     } else {
-      vibrateTap(); // Light feedback when uncompleting
+      hapticLight(); // Light feedback when uncompleting
     }
     
     onUpdate({ ...exercise, sets: newSets });
@@ -207,11 +207,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => markSetComplete(index)}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors touch-target ${
+                  className={`btn-ios-stepper rounded-full ${
                     set.completed 
                       ? 'set-complete' 
                       : 'set-incomplete'
                   }`}
+                  aria-label={set.completed ? 'Mark set as incomplete' : 'Mark set as complete'}
                 >
                   {set.completed ? <CheckCircle className="w-5 h-5" /> : '○'}
                 </button>
@@ -231,7 +232,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => adjustWeight(index, -5)}
-                    className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold touch-target"
+                    className="btn-ios-stepper"
+                    aria-label="Decrease weight by 5kg"
                   >
                     -5
                   </button>
@@ -239,12 +241,15 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                     type="number"
                     value={set.weight || ''}
                     onChange={(e) => updateSet(index, 'weight', parseFloat(e.target.value) || 0)}
-                    className="workout-input flex-1 text-center"
+                    className="input-ios flex-1"
                     placeholder="0"
+                    inputMode="numeric"
+                    aria-label="Weight in kilograms"
                   />
                   <button
                     onClick={() => adjustWeight(index, 5)}
-                    className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold touch-target"
+                    className="btn-ios-stepper"
+                    aria-label="Increase weight by 5kg"
                   >
                     +5
                   </button>
@@ -257,7 +262,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => adjustReps(index, -1)}
-                    className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold touch-target"
+                    className="btn-ios-stepper"
+                    aria-label="Decrease reps by 1"
                   >
                     <Minus className="w-4 h-4 mx-auto" />
                   </button>
@@ -265,12 +271,15 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
                     type="number"
                     value={set.reps || ''}
                     onChange={(e) => updateSet(index, 'reps', parseInt(e.target.value) || 0)}
-                    className="workout-input flex-1 text-center"
+                    className="input-ios flex-1"
                     placeholder="0"
+                    inputMode="numeric"
+                    aria-label="Number of repetitions"
                   />
                   <button
                     onClick={() => adjustReps(index, 1)}
-                    className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold touch-target"
+                    className="btn-ios-stepper"
+                    aria-label="Increase reps by 1"
                   >
                     <Plus className="w-4 h-4 mx-auto" />
                   </button>

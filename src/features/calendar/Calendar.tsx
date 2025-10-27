@@ -111,7 +111,16 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
             <div key={dateString}>
               <div
                 onClick={() => handleDayClick(dateString)}
-                className={`calendar-day cursor-pointer ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
+                className={`calendar-day ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleDayClick(dateString);
+                  }
+                }}
+                aria-label={`${dayName} ${dateNum}${workoutData ? ` - ${workoutData.workoutType} workout` : ''}`}
               >
                 <span className="text-sm font-medium text-gray-400">{dayName}</span>
                 <span className="text-2xl font-bold mt-1">{dateNum}</span>

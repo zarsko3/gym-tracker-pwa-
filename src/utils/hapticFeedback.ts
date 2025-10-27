@@ -1,3 +1,4 @@
+// iOS Haptic Feedback Implementation
 export const vibrate = (pattern: number | number[] = 10): void => {
   if ('vibrate' in navigator) {
     try {
@@ -6,6 +7,43 @@ export const vibrate = (pattern: number | number[] = 10): void => {
       // Ignore vibration errors (some browsers don't support it)
       console.debug('Vibration not supported or blocked');
     }
+  }
+};
+
+// iOS-specific haptic feedback using Web Haptics API when available
+export const hapticLight = (): void => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10); // Light impact
+  }
+};
+
+export const hapticMedium = (): void => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(20); // Medium impact
+  }
+};
+
+export const hapticHeavy = (): void => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50); // Heavy impact
+  }
+};
+
+export const hapticSuccess = (): void => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate([100, 50, 100]); // Success pattern
+  }
+};
+
+export const hapticError = (): void => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate([200, 100, 200, 100, 200]); // Error pattern
+  }
+};
+
+export const hapticSelection = (): void => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(5); // Selection feedback
   }
 };
 

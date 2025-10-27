@@ -1,27 +1,62 @@
 @import 'tailwindcss';
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-body {
-  font-family: 'Inter', sans-serif;
+/* iOS Safe Areas and Typography */
+html, body { 
+  height: 100%; 
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom styles for a cleaner look */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 17px; /* iOS base font size */
+  line-height: 1.47;
+}
+
+/* Safe area container */
+.app {
+  padding-left: 16px; 
+  padding-right: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  padding-top: calc(8px + env(safe-area-inset-top));
+  min-height: 100vh;
+}
+
+/* Tab bar safe area */
+.tabbar {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* iOS Dynamic Type support - using Tailwind classes instead of custom */
+
+/* iOS minimum text size enforcement */
+* {
+  font-size: max(11px, 1em);
+}
+
+/* iOS-optimized component styles */
+
+/* Calendar day cells - iPhone optimized */
 .calendar-day {
-  @apply relative flex flex-col items-center justify-center p-2 h-24 rounded-lg shadow-md transition-all duration-200 cursor-pointer;
-  @apply bg-gray-800 border border-gray-700;
+    @apply relative flex flex-col items-center justify-center rounded-xl shadow-sm transition-all duration-200 cursor-pointer;
+    @apply bg-gray-800 border border-gray-700;
+    min-height: 44px; /* iOS minimum tap target */
+    padding: 8px 4px;
+    margin: 2px;
 }
 
 .calendar-day:hover {
-  @apply bg-gray-700 ring-2 ring-indigo-500;
+    @apply bg-gray-700 ring-2 ring-indigo-500;
 }
 
 .calendar-day.today {
-  @apply bg-indigo-800 text-white font-bold border-indigo-600;
+    @apply bg-indigo-800 text-white font-semibold border-indigo-600;
 }
 
 .calendar-day.selected {
-  @apply ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-400 bg-gray-700;
+    @apply ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-400 bg-gray-700;
 }
 
 .workout-marker {
@@ -33,26 +68,100 @@ body {
 .workout-legs { @apply bg-green-500; }
 .workout-rest { @apply bg-gray-500; }
 
-/* Custom Modal */
+/* iOS button styles - 44pt minimum */
+.btn-ios {
+    min-height: 44px;
+    min-width: 44px;
+    @apply px-4 py-3 rounded-xl font-semibold text-base;
+    @apply bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700;
+    @apply text-white transition-colors duration-150;
+    @apply flex items-center justify-center;
+}
+
+.btn-ios-secondary {
+    min-height: 44px;
+    min-width: 44px;
+    @apply px-4 py-3 rounded-xl font-semibold text-base;
+    @apply bg-gray-600 hover:bg-gray-700 active:bg-gray-800;
+    @apply text-white transition-colors duration-150;
+    @apply flex items-center justify-center;
+}
+
+.btn-ios-stepper {
+    min-height: 44px;
+    min-width: 44px;
+    @apply rounded-lg font-bold text-lg;
+    @apply bg-gray-600 hover:bg-gray-500 active:bg-gray-700;
+    @apply text-white transition-colors duration-150;
+    @apply flex items-center justify-center;
+}
+
+/* iOS input styles */
+.input-ios {
+    min-height: 44px;
+    @apply px-4 py-3 rounded-lg text-center font-semibold text-lg;
+    @apply bg-gray-800 text-white border-2 border-transparent;
+    @apply focus:border-indigo-500 focus:outline-none;
+    @apply transition-colors duration-150;
+}
+
+.input-ios:focus {
+    @apply border-indigo-500;
+    outline: none;
+}
+
+/* iOS navigation styles */
+.nav-ios {
+    @apply bg-gray-800 border-b border-gray-700;
+    padding-top: calc(8px + env(safe-area-inset-top));
+    padding-bottom: 8px;
+}
+
+.tab-ios {
+    min-height: 44px;
+    @apply flex items-center justify-center px-3 py-2;
+    @apply text-xs font-medium;
+    @apply text-gray-400 hover:text-white;
+    @apply transition-colors duration-150;
+}
+
+.tab-ios.active {
+    @apply text-indigo-400;
+}
+
+/* iOS modal and sheet styles */
 .modal-backdrop {
   @apply fixed inset-0 bg-black/75 flex items-center justify-center z-50 transition-opacity duration-300;
 }
 
 .modal-content {
-  @apply bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-95;
+    @apply bg-gray-800 rounded-t-3xl shadow-xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-95;
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
 .modal-hidden {
-  @apply opacity-0 pointer-events-none;
+    @apply opacity-0 pointer-events-none;
 }
 
 .modal-visible {
-  @apply opacity-100 scale-100;
+    @apply opacity-100 scale-100;
+}
+
+/* iOS bottom sheet */
+.bottom-sheet {
+    @apply fixed bottom-0 left-0 right-0 bg-gray-800 rounded-t-3xl shadow-2xl;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+}
+
+.bottom-sheet.open {
+    transform: translateY(0);
 }
 
 /* Loading Spinner */
 .spinner {
-  @apply w-12 h-12 border-4 border-t-indigo-500 border-gray-600 rounded-full animate-spin;
+    @apply w-12 h-12 border-4 border-t-indigo-500 border-gray-600 rounded-full animate-spin;
 }
 
 /* Helper for hiding elements */
@@ -135,4 +244,45 @@ body {
 
 .rest-timer-complete {
     @apply bg-green-900/30 border border-green-500/50;
+}
+
+/* iOS haptic feedback classes */
+.haptic-light {
+    /* Light impact feedback */
+}
+
+.haptic-medium {
+    /* Medium impact feedback */
+}
+
+.haptic-heavy {
+    /* Heavy impact feedback */
+}
+
+.haptic-success {
+    /* Success notification feedback */
+}
+
+.haptic-error {
+    /* Error notification feedback */
+}
+
+/* iOS accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .calendar-day {
+        @apply border-2 border-white;
+    }
+    
+    .btn-ios {
+        @apply border-2 border-white;
+    }
 }

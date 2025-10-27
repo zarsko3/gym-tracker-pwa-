@@ -6,7 +6,7 @@ import { DEFAULT_TEMPLATES } from '../../services/templates';
 import { useWorkoutTimer } from '../../hooks/useWorkoutTimer';
 import { useRestTimer } from '../../hooks/useRestTimer';
 import { calculateTotalVolume, calculateSetsCompleted, calculateTotalSets } from '../../utils/workoutCalculations';
-import { vibrateTap, vibrateSuccess, vibrateWarning } from '../../utils/hapticFeedback';
+import { hapticLight, hapticSuccess, hapticSelection } from '../../utils/hapticFeedback';
 import { X, Play, Pause, Square, Clock, CheckCircle } from 'lucide-react';
 
 interface WorkoutData {
@@ -54,7 +54,7 @@ const InlineWorkoutPanel: React.FC<InlineWorkoutPanelProps> = ({
   }, [existingWorkout]);
 
   const handleWorkoutTypeSelect = (type: string) => {
-    vibrateTap();
+    hapticSelection();
     
     if (type === 'Rest') {
       handleSaveWorkout('Rest', []);
@@ -106,12 +106,12 @@ const InlineWorkoutPanel: React.FC<InlineWorkoutPanelProps> = ({
   };
 
   const handleStartWorkout = () => {
-    vibrateSuccess();
+    hapticSuccess();
     workoutTimer.start();
   };
 
   const handleSetComplete = () => {
-    vibrateTap();
+    hapticLight();
     restTimer.start();
   };
 
@@ -212,17 +212,18 @@ const InlineWorkoutPanel: React.FC<InlineWorkoutPanelProps> = ({
       {!selectedType && (
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-300 mb-2">Select Workout Type</h4>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {WORKOUT_TYPES.map(type => (
               <button
                 key={type}
                 onClick={() => handleWorkoutTypeSelect(type)}
-                className={`py-3 px-4 rounded-lg font-medium transition-all ${
-                  type === 'Push' ? 'bg-red-600 hover:bg-red-700 text-white' :
-                  type === 'Pull' ? 'bg-blue-600 hover:bg-blue-700 text-white' :
-                  type === 'Legs' ? 'bg-green-600 hover:bg-green-700 text-white' :
-                  'bg-gray-600 hover:bg-gray-700 text-white'
+                className={`btn-ios ${
+                  type === 'Push' ? 'bg-red-600 hover:bg-red-700 active:bg-red-800' :
+                  type === 'Pull' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' :
+                  type === 'Legs' ? 'bg-green-600 hover:bg-green-700 active:bg-green-800' :
+                  'bg-gray-600 hover:bg-gray-700 active:bg-gray-800'
                 }`}
+                aria-label={`Select ${type} workout`}
               >
                 {type}
               </button>
