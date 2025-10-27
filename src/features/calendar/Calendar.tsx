@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import InlineWorkoutPanel from './InlineWorkoutPanel';
 
 interface WorkoutData {
   date: string;
@@ -23,6 +23,7 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [expandedDate, setExpandedDate] = useState<string | null>(null);
 
   const getWeekStartDate = (date: Date) => {
     const d = new Date(date);
@@ -59,6 +60,10 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
 
   const goToToday = () => {
     setCurrentDate(new Date());
+  };
+
+  const handleDayClick = (dateString: string) => {
+    setExpandedDate(expandedDate === dateString ? null : dateString);
   };
 
   const weekStart = getWeekStartDate(currentDate);
@@ -103,17 +108,26 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
           const workoutData = workouts[dateString];
           
           return (
-            <Link
-              key={dateString}
-              to={`/workout/${dateString}`}
-              className={`calendar-day ${isToday(dayDate) ? 'today' : ''}`}
-            >
-              <span className="text-sm font-medium text-gray-400">{dayName}</span>
-              <span className="text-2xl font-bold mt-1">{dateNum}</span>
-              {workoutData && (
-                <div className={`workout-marker workout-${workoutData.workoutType.toLowerCase()}`}></div>
+            <div key={dateString}>
+              <div
+                onClick={() => handleDayClick(dateString)}
+                className={`calendar-day cursor-pointer ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
+              >
+                <span className="text-sm font-medium text-gray-400">{dayName}</span>
+                <span className="text-2xl font-bold mt-1">{dateNum}</span>
+                {workoutData && (
+                  <div className={`workout-marker workout-${workoutData.workoutType.toLowerCase()}`}></div>
+                )}
+              </div>
+              
+              {expandedDate === dateString && (
+                <InlineWorkoutPanel 
+                  date={dateString}
+                  existingWorkout={workoutData}
+                  onClose={() => setExpandedDate(null)}
+                />
               )}
-            </Link>
+            </div>
           );
         })}
       </div>

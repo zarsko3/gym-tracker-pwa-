@@ -1,0 +1,389 @@
+import React, { useState, useEffect } from 'react';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
+import { db } from '../../services/firebase';
+import { DEFAULT_TEMPLATES } from '../../services/templates';
+import { useWorkoutTimer } from '../../hooks/useWorkoutTimer';
+import { useRestTimer } from '../../hooks/useRestTimer';
+import { calculateTotalVolume, calculateSetsCompleted, calculateTotalSets } from '../../utils/workoutCalculations';
+import { vibrateTap, vibrateSuccess, vibrateWarning } from '../../utils/hapticFeedback';
+import { X, Play, Pause, Square, Clock, CheckCircle } from 'lucide-react';
+
+interface WorkoutData {
+  date: string;
+  workoutType: string;
+  templateId: string;
+  exercises: Array<{
+    name: string;
+    sets: Array<{
+      reps: number;
+      weight: number;
+      completed?: boolean;
+    }>;
+  }>;
+}
+
+interface InlineWorkoutPanelProps {
+  date: string;
+  existingWorkout?: WorkoutData;
+  onClose: () => void;
+}
+
+const WORKOUT_TYPES = ['Push', 'Pull', 'Legs', 'Rest'] as const;
+
+const InlineWorkoutPanel: React.FC<InlineWorkoutPanelProps> = ({ 
+  date, 
+  existingWorkout, 
+  onClose 
+}) => {
+  const { user } = useAuth();
+  const [workoutData, setWorkoutData] = useState<WorkoutData | null>(existingWorkout || null);
+  const [selectedType, setSelectedType] = useState<string>(existingWorkout?.workoutType || '');
+  const [exercises, setExercises] = useState<WorkoutData['exercises']>(existingWorkout?.exercises || []);
+  const [saving, setSaving] = useState(false);
+  
+  const workoutTimer = useWorkoutTimer();
+  const restTimer = useRestTimer(90);
+
+  useEffect(() => {
+    if (existingWorkout) {
+      setWorkoutData(existingWorkout);
+      setSelectedType(existingWorkout.workoutType);
+      setExercises(existingWorkout.exercises);
+    }
+  }, [existingWorkout]);
+
+  const handleWorkoutTypeSelect = (type: string) => {
+    vibrateTap();
+    
+    if (type === 'Rest') {
+      handleSaveWorkout('Rest', []);
+      return;
+    }
+
+    setSelectedType(type);
+    const template = DEFAULT_TEMPLATES['ppl-default'];
+    const exerciseNames = template.workouts[type as keyof typeof template.workouts] || [];
+    
+    const newExercises = exerciseNames.map((name: string) => ({
+      name,
+      sets: [{ reps: 0, weight: 0, completed: false }]
+    }));
+    
+    setExercises(newExercises);
+  };
+
+  const handleExerciseUpdate = (index: number, updatedExercise: WorkoutData['exercises'][0]) => {
+    const newExercises = [...exercises];
+    newExercises[index] = updatedExercise;
+    setExercises(newExercises);
+  };
+
+  const handleSaveWorkout = async (type?: string, exerciseData?: WorkoutData['exercises']) => {
+    if (!user || !date) return;
+
+    setSaving(true);
+    try {
+      const workoutType = type || selectedType;
+      const exerciseList = exerciseData || exercises;
+
+      const workoutToSave: WorkoutData = {
+        date,
+        workoutType,
+        templateId: 'ppl-default',
+        exercises: exerciseList
+      };
+
+      const workoutRef = doc(db, 'users', user.uid, 'workouts', date);
+      await setDoc(workoutRef, workoutToSave);
+      
+      setWorkoutData(workoutToSave);
+    } catch (error) {
+      console.error('Error saving workout:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleStartWorkout = () => {
+    vibrateSuccess();
+    workoutTimer.start();
+  };
+
+  const handleSetComplete = () => {
+    vibrateTap();
+    restTimer.start();
+  };
+
+  const totalVolume = calculateTotalVolume(exercises);
+  const setsCompleted = calculateSetsCompleted(exercises);
+  const totalSets = calculateTotalSets(exercises);
+
+  return (
+    <div className="mt-4 bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-700 animate-slide-down">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-white">
+          {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'short', 
+            day: 'numeric' 
+          })}
+        </h3>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-400" />
+        </button>
+      </div>
+
+      {/* Timer Section */}
+      {selectedType && selectedType !== 'Rest' && (
+        <div className="mb-4 p-3 bg-gray-700 rounded-lg">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-indigo-400" />
+              <span className="text-sm font-medium text-gray-300">Workout Timer</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {!workoutTimer.isActive ? (
+                <button
+                  onClick={handleStartWorkout}
+                  className="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Play className="w-4 h-4" />
+                  Start
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={workoutTimer.pause}
+                    className="p-1 hover:bg-gray-600 rounded transition-colors"
+                  >
+                    <Pause className="w-4 h-4 text-gray-400" />
+                  </button>
+                  <button
+                    onClick={workoutTimer.stop}
+                    className="p-1 hover:bg-gray-600 rounded transition-colors"
+                  >
+                    <Square className="w-4 h-4 text-gray-400" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="text-2xl font-mono font-bold text-indigo-400">
+            {workoutTimer.formattedTime}
+          </div>
+        </div>
+      )}
+
+      {/* Rest Timer */}
+      {restTimer.isActive && (
+        <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-blue-400" />
+              <span className="text-sm font-medium text-blue-300">Rest Time</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={restTimer.pause}
+                className="p-1 hover:bg-blue-800/50 rounded transition-colors"
+              >
+                <Pause className="w-4 h-4 text-blue-400" />
+              </button>
+              <button
+                onClick={restTimer.skip}
+                className="p-1 hover:bg-blue-800/50 rounded transition-colors"
+              >
+                <X className="w-4 h-4 text-blue-400" />
+              </button>
+            </div>
+          </div>
+          <div className="text-2xl font-mono font-bold text-blue-400">
+            {restTimer.formattedTime}
+          </div>
+        </div>
+      )}
+
+      {/* Workout Type Selector */}
+      {!selectedType && (
+        <div className="mb-4">
+          <h4 className="text-sm font-medium text-gray-300 mb-2">Select Workout Type</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {WORKOUT_TYPES.map(type => (
+              <button
+                key={type}
+                onClick={() => handleWorkoutTypeSelect(type)}
+                className={`py-3 px-4 rounded-lg font-medium transition-all ${
+                  type === 'Push' ? 'bg-red-600 hover:bg-red-700 text-white' :
+                  type === 'Pull' ? 'bg-blue-600 hover:bg-blue-700 text-white' :
+                  type === 'Legs' ? 'bg-green-600 hover:bg-green-700 text-white' :
+                  'bg-gray-600 hover:bg-gray-700 text-white'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Workout Summary */}
+      {selectedType && selectedType !== 'Rest' && (
+        <div className="mb-4 p-3 bg-gray-700 rounded-lg">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-white">{totalVolume.toLocaleString()}</div>
+              <div className="text-xs text-gray-400">Total Volume (kg)</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-white">{setsCompleted}/{totalSets}</div>
+              <div className="text-xs text-gray-400">Sets Complete</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-white">{exercises.length}</div>
+              <div className="text-xs text-gray-400">Exercises</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Exercise List */}
+      {selectedType && selectedType !== 'Rest' && (
+        <div className="space-y-3">
+          {exercises.map((exercise, index) => (
+            <div key={index} className="bg-gray-700 rounded-lg p-3">
+              <div className="flex justify-between items-center mb-2">
+                <h5 className="font-medium text-white">{exercise.name}</h5>
+                <div className="text-sm text-gray-400">
+                  {exercise.sets.filter(s => s.completed).length}/{exercise.sets.length} sets
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                {exercise.sets.map((set, setIndex) => (
+                  <div key={setIndex} className="flex items-center gap-2">
+                    <div className="flex-1 flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            const newSets = [...exercise.sets];
+                            newSets[setIndex] = { ...set, weight: Math.max(0, set.weight - 5) };
+                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          }}
+                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                        >
+                          -5
+                        </button>
+                        <input
+                          type="number"
+                          value={set.weight || ''}
+                          onChange={(e) => {
+                            const newSets = [...exercise.sets];
+                            newSets[setIndex] = { ...set, weight: Number(e.target.value) || 0 };
+                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          }}
+                          className="w-16 h-8 bg-gray-800 text-white text-center rounded font-bold"
+                          placeholder="0"
+                        />
+                        <button
+                          onClick={() => {
+                            const newSets = [...exercise.sets];
+                            newSets[setIndex] = { ...set, weight: set.weight + 5 };
+                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          }}
+                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                        >
+                          +5
+                        </button>
+                      </div>
+                      
+                      <span className="text-gray-400">×</span>
+                      
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            const newSets = [...exercise.sets];
+                            newSets[setIndex] = { ...set, reps: Math.max(0, set.reps - 1) };
+                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          }}
+                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          value={set.reps || ''}
+                          onChange={(e) => {
+                            const newSets = [...exercise.sets];
+                            newSets[setIndex] = { ...set, reps: Number(e.target.value) || 0 };
+                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          }}
+                          className="w-16 h-8 bg-gray-800 text-white text-center rounded font-bold"
+                          placeholder="0"
+                        />
+                        <button
+                          onClick={() => {
+                            const newSets = [...exercise.sets];
+                            newSets[setIndex] = { ...set, reps: set.reps + 1 };
+                            handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                          }}
+                          className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded font-bold"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        const newSets = [...exercise.sets];
+                        newSets[setIndex] = { ...set, completed: !set.completed };
+                        handleExerciseUpdate(index, { ...exercise, sets: newSets });
+                        if (!set.completed) {
+                          handleSetComplete();
+                        }
+                      }}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                        set.completed 
+                          ? 'bg-green-600 text-white' 
+                          : 'bg-gray-600 hover:bg-gray-500 text-gray-400'
+                      }`}
+                    >
+                      {set.completed ? <CheckCircle className="w-5 h-5" /> : '○'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Save Button */}
+      {selectedType && (
+        <div className="mt-4 flex gap-2">
+          <button
+            onClick={() => handleSaveWorkout()}
+            disabled={saving}
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save Workout'}
+          </button>
+        </div>
+      )}
+
+      {selectedType === 'Rest' && (
+        <div className="text-center py-8">
+          <div className="text-6xl mb-4">😴</div>
+          <p className="text-gray-400">Rest day logged</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default InlineWorkoutPanel;

@@ -6,6 +6,7 @@ import { db } from '../../services/firebase';
 import Calendar from './Calendar';
 import DashboardStats from './DashboardStats';
 import ProgressChart from './ProgressChart';
+import VolumeChart from '../progress/VolumeChart';
 import { Calendar as CalendarIcon, BarChart3, Settings, User } from 'lucide-react';
 
 interface WorkoutData {
@@ -110,6 +111,9 @@ const Dashboard: React.FC = () => {
             <h2 className="text-xl font-semibold text-white mb-4">Exercise Progress</h2>
             <ProgressChart workouts={workouts} />
           </div>
+
+          {/* Volume Chart */}
+          <VolumeChart workouts={workouts} />
 
           {/* Workout Legend */}
           <div className="bg-gray-800 rounded-lg shadow-xl p-6">
