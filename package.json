@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "firebase:deploy": "npm run build && firebase deploy",
-    "firebase:serve": "npm run build && firebase serve"
+    "firebase:serve": "npm run build && firebase serve",
+    "vercel:deploy": "vercel --prod"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.16",
