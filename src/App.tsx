@@ -9,6 +9,7 @@ import Progress from './features/progress/Progress';
 import Templates from './features/templates/Templates';
 import Profile from './features/auth/Profile';
 import LoadingSpinner from './components/LoadingSpinner';
+import DataUpload from './features/admin/DataUpload';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -94,6 +95,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/upload-data" 
+              element={
+                <ProtectedRoute>
+                  <DataUpload />
                 </ProtectedRoute>
               } 
             />

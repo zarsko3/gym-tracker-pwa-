@@ -7,7 +7,7 @@ import Calendar from './Calendar';
 import DashboardStats from './DashboardStats';
 import ProgressChart from './ProgressChart';
 import VolumeChart from '../progress/VolumeChart';
-import { Calendar as CalendarIcon, BarChart3, Settings, User } from 'lucide-react';
+import { Calendar as CalendarIcon, BarChart3, Settings, User, Upload } from 'lucide-react';
 
 interface WorkoutData {
   date: string;
@@ -89,6 +89,13 @@ const Dashboard: React.FC = () => {
               >
                 <User className="w-4 h-4 mr-2" />
                 Profile
+              </Link>
+              <Link
+                to="/upload-data"
+                className="flex items-center px-3 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Data
               </Link>
             </nav>
           </div>
