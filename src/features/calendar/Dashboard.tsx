@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../services/firebase';
-import Calendar from './Calendar';
-import DashboardStats from './DashboardStats';
-import ProgressChart from './ProgressChart';
-import VolumeChart from '../progress/VolumeChart';
-import { Calendar as CalendarIcon, BarChart3, Settings, User, Upload } from 'lucide-react';
 import IOSHeader from '../../components/iOSHeader';
+import TodayWorkoutCard from '../dashboard/TodayWorkoutCard';
+import QuickStatsCard from '../dashboard/QuickStatsCard';
+import CategoryCards from '../dashboard/CategoryCards';
+import RecentActivityList from '../dashboard/RecentActivityList';
+import Calendar from './Calendar';
+import VolumeChart from '../progress/VolumeChart';
+import { BarChart3, Upload } from 'lucide-react';
 
 interface WorkoutData {
   date: string;
@@ -56,77 +58,58 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  const today = new Date().toISOString().split('T')[0];
+  const todayWorkout = workouts[today];
+
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* iOS Header */}
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       <IOSHeader 
-        title="Gym Tracker"
+        title="Dashboard"
         rightAction={
           <div className="flex items-center gap-2">
-            <Link
-              to="/progress"
-              className="btn-ios-stepper w-11 h-11"
-              aria-label="Progress"
-            >
+            <Link to="/progress" className="btn-ios-stepper w-11 h-11">
               <BarChart3 className="w-5 h-5" />
             </Link>
-            <Link
-              to="/upload-data"
-              className="btn-ios-stepper w-11 h-11"
-              aria-label="Upload Data"
-            >
+            <Link to="/upload-data" className="btn-ios-stepper w-11 h-11">
               <Upload className="w-5 h-5" />
             </Link>
           </div>
         }
       />
 
-      {/* Main Content */}
       <main className="container-responsive py-4 md:py-6 lg:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {/* Calendar - full width on mobile, 2/3 on tablet, 1/2 on desktop */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-2">
-            <div className="bg-gray-800 rounded-lg shadow-xl p-6 md:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content - Left/Top */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Today's Workout - Prominent */}
+            <TodayWorkoutCard 
+              todayWorkout={todayWorkout}
+              todayDate={today}
+            />
+
+            {/* Quick Stats */}
+            <QuickStatsCard workouts={workouts} />
+
+            {/* Category Cards */}
+            <CategoryCards workouts={workouts} />
+
+            {/* Calendar Section */}
+            <div className="card-modern p-6">
+              <h3 className="text-heading-md text-white mb-4">Calendar</h3>
               <Calendar workouts={workouts} />
             </div>
-          </div>
-          
-          {/* Stats sidebar - stacked on mobile, sidebar on tablet+ */}
-          <div className="col-span-1 space-y-4">
-            <DashboardStats workouts={workouts} />
-            <div className="bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
-              <h2 className="text-lg md:text-xl font-semibold text-white mb-4">Exercise Progress</h2>
-              <ProgressChart workouts={workouts} />
+
+            {/* Volume Chart */}
+            <div className="card-modern p-6">
+              <VolumeChart workouts={workouts} weeks={4} />
             </div>
           </div>
 
-          {/* Volume Chart - full width on mobile, spans both columns on tablet+ */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-3">
-            <VolumeChart workouts={workouts} />
-          </div>
-
-          {/* Workout Legend - full width on mobile, spans both columns on tablet+ */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-3">
-            <div className="bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
-              <h3 className="text-lg font-semibold mb-4">Workout Legend</h3>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center">
-                  <span className="w-4 h-4 rounded-full bg-red-500 mr-2"></span>
-                  Push
-                </div>
-                <div className="flex items-center">
-                  <span className="w-4 h-4 rounded-full bg-blue-500 mr-2"></span>
-                  Pull
-                </div>
-                <div className="flex items-center">
-                  <span className="w-4 h-4 rounded-full bg-green-500 mr-2"></span>
-                  Legs
-                </div>
-                <div className="flex items-center">
-                  <span className="w-4 h-4 rounded-full bg-gray-500 mr-2"></span>
-                  Rest
-                </div>
-              </div>
+          {/* Sidebar - Desktop Only */}
+          <div className="hidden lg:block space-y-6">
+            <div className="card-modern p-6 sticky top-4">
+              <h3 className="text-heading-md text-white mb-4">Recent Activity</h3>
+              <RecentActivityList workouts={workouts} />
             </div>
           </div>
         </div>
@@ -136,3 +119,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+

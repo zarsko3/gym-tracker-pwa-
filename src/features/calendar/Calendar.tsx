@@ -121,7 +121,12 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
             <div key={dateString}>
               <div
                 onClick={() => handleDayClick(dateString)}
-                className={`calendar-day ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
+                className={`
+                  calendar-day relative overflow-hidden
+                  ${isToday(dayDate) ? 'ring-2 ring-indigo-500 bg-indigo-500/10' : 'bg-gray-800/50'}
+                  ${expandedDate === dateString ? 'ring-2 ring-indigo-400 scale-105' : ''}
+                  hover:bg-gray-700/70 transition-all duration-200
+                `}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -132,10 +137,16 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
                 }}
                 aria-label={`${dayName} ${dateNum}${workoutData ? ` - ${workoutData.workoutType} workout` : ''}`}
               >
-                <span className="text-xs sm:text-sm font-medium text-gray-400 mb-1">{dayName}</span>
-                <span className="text-xl sm:text-2xl font-bold text-white">{dateNum}</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-400 mb-1">
+                  {dayName}
+                </span>
+                <span className="text-xl sm:text-2xl font-bold text-white">
+                  {dateNum}
+                </span>
                 {workoutData && (
-                  <div className={`workout-marker workout-${workoutData.workoutType.toLowerCase()}`}></div>
+                  <div className="absolute bottom-0 left-0 right-0">
+                    <div className={`h-1 workout-${workoutData.workoutType.toLowerCase()} opacity-80`} />
+                  </div>
                 )}
               </div>
             </div>

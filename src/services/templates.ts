@@ -104,4 +104,71 @@ export type WorkoutTemplate = {
   workouts: Record<string, string[]>;
 };
 
+export interface ExerciseCategory {
+  id: string;
+  name: string;
+  muscleGroups: string[];
+  icon: string;
+}
+
+export const EXERCISE_CATEGORIES: Record<string, ExerciseCategory> = {
+  chest: {
+    id: 'chest',
+    name: 'Chest',
+    muscleGroups: ['Pectorals'],
+    icon: 'dumbbell'
+  },
+  back: {
+    id: 'back',
+    name: 'Back',
+    muscleGroups: ['Lats', 'Rhomboids', 'Traps'],
+    icon: 'trending-up'
+  },
+  shoulders: {
+    id: 'shoulders',
+    name: 'Shoulders',
+    muscleGroups: ['Deltoids'],
+    icon: 'activity'
+  },
+  arms: {
+    id: 'arms',
+    name: 'Arms',
+    muscleGroups: ['Biceps', 'Triceps'],
+    icon: 'zap'
+  },
+  legs: {
+    id: 'legs',
+    name: 'Legs',
+    muscleGroups: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
+    icon: 'activity'
+  },
+  warmup: {
+    id: 'warmup',
+    name: 'Warm-up',
+    muscleGroups: ['General'],
+    icon: 'flame'
+  }
+};
+
+// Map exercises to categories
+export const EXERCISE_TO_CATEGORY: Record<string, string> = {
+  'Bench Press or Dumbbell Press': 'chest',
+  'Incline Dumbbell Press': 'chest',
+  'Overhead Shoulder Press': 'shoulders',
+  'Lateral Raises': 'shoulders',
+  'Triceps Pushdowns': 'arms',
+  'Skull Crushers or Dips': 'arms',
+  'Pull-Ups or Lat Pulldown': 'back',
+  'Barbell Row or Dumbbell Row': 'back',
+  'Face Pulls': 'shoulders',
+  'Cable Bicep Curls': 'arms',
+  'Hammer Curls': 'arms',
+  'Squats or Leg Press': 'legs',
+  'Romanian Deadlift': 'legs',
+  'Lunges or Bulgarian Split Squat': 'legs',
+  'Leg Curl Machine': 'legs',
+  'Standing Calf Raises': 'legs',
+  'Plank or Hanging Leg Raises': 'legs'
+};
+
 export type WorkoutType = 'Push' | 'Pull' | 'Legs' | 'Rest' | string;
