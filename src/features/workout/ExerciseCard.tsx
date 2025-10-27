@@ -22,9 +22,10 @@ interface ExerciseCardProps {
   exercise: Exercise;
   onUpdate: (exercise: Exercise) => void;
   workoutDate: string;
+  onSetComplete?: () => void;
 }
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workoutDate }) => {
+const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workoutDate, onSetComplete }) => {
   const { user } = useAuth();
   const [lastWorkoutStats, setLastWorkoutStats] = useState<string>('Last: N/A');
   const [saving, setSaving] = useState(false);
@@ -160,6 +161,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onUpdate, workout
     
     if (!wasCompleted) {
       hapticSuccess(); // Success feedback when completing a set
+      onSetComplete?.(); // Trigger rest timer if callback provided
     } else {
       hapticLight(); // Light feedback when uncompleting
     }

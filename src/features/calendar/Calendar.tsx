@@ -118,7 +118,7 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
           const workoutData = workouts[dateString];
           
           return (
-            <div key={dateString} className="flex flex-col">
+            <div key={dateString}>
               <div
                 onClick={() => handleDayClick(dateString)}
                 className={`calendar-day ${isToday(dayDate) ? 'today' : ''} ${expandedDate === dateString ? 'selected' : ''}`}
@@ -138,20 +138,21 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
                   <div className={`workout-marker workout-${workoutData.workoutType.toLowerCase()}`}></div>
                 )}
               </div>
-              
-              {expandedDate === dateString && (
-                <div className="mt-3">
-                  <InlineWorkoutPanel 
-                    date={dateString}
-                    existingWorkout={workoutData}
-                    onClose={() => setExpandedDate(null)}
-                  />
-                </div>
-              )}
             </div>
           );
         })}
       </div>
+      
+      {/* Workout panel - positioned below the calendar grid */}
+      {expandedDate && (
+        <div className="mt-6">
+          <InlineWorkoutPanel 
+            date={expandedDate}
+            existingWorkout={workouts[expandedDate]}
+            onClose={() => setExpandedDate(null)}
+          />
+        </div>
+      )}
     </div>
   );
 };

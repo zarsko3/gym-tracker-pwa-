@@ -208,6 +208,12 @@ body {
     animation: slide-down 0.3s ease-out;
 }
 
+/* Inline workout panel positioning */
+.inline-workout-panel {
+    @apply w-full;
+    z-index: 10; /* Ensure it appears above other elements */
+}
+
 /* Gym-optimized UI styles */
 .workout-active {
     background: #0a0a0a;
