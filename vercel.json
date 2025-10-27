@@ -11,7 +11,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!sw\\.js|workbox-.*\\.js|registerSW\\.js|manifest\\.json|vite\\.svg).*)",
+      "source": "/((?!sw\\.js|registerSW\\.js|manifest\\.json|vite\\.svg|workbox-).*)",
       "destination": "/index.html"
     }
   ],
@@ -26,19 +26,6 @@
         {
           "key": "Service-Worker-Allowed",
           "value": "/"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/workbox-.*\\.js",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript"
         },
         {
           "key": "Cache-Control",
