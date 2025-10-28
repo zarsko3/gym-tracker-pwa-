@@ -13,7 +13,7 @@ const Splash3: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-[var(--color-primary)] flex flex-col items-center justify-center px-6">
+    <div className="h-screen w-full bg-[var(--color-primary)] flex flex-col items-center justify-center px-6">
       <div className="w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center mb-8">
         <Dumbbell className="w-10 h-10 text-white" />
       </div>

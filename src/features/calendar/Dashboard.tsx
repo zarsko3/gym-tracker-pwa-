@@ -9,6 +9,7 @@ const Dashboard: React.FC = () => {
   const [activeDayValue, setActiveDayValue] = useState<number>(initialDisplayDay);
 
   const today = new Date();
+  const todayDay = today.getDate();
   const greeting = `Hi!,\n${user?.displayName || 'Zarsko'}`;
   const displayMonthName = today.toLocaleString('en-US', { month: 'long' });
   const displayYear = today.getFullYear();
@@ -23,8 +24,9 @@ const Dashboard: React.FC = () => {
       Array.from({ length: 14 }, (_, index) => ({
         value: index + 1,
         isSelected: index + 1 === activeDayValue,
+        isToday: index + 1 === todayDay,
       })),
-    [activeDayValue]
+    [activeDayValue, todayDay]
   );
 
   const chartData = useMemo(
@@ -80,7 +82,9 @@ const Dashboard: React.FC = () => {
                   className={`h-11 rounded-full border transition-all duration-150 ${
                     day.isSelected
                       ? 'border-0 bg-[#FFB8E0] text-[#271535] shadow-[0_12px_36px_rgba(255,184,224,0.35)]'
-                      : 'border-white/35 text-white/75 hover:border-white/60'
+                      : day.isToday
+                        ? 'border-white/60 text-white bg-white/5'
+                        : 'border-white/35 text-white/75 hover:border-white/60'
                   }`}
                   onClick={() => handleDaySelect(day.value)}
                 >
@@ -94,7 +98,11 @@ const Dashboard: React.FC = () => {
                 <button
                   key={`week-two-${day.value}`}
                   type="button"
-                  className="h-11 rounded-full border border-white/35 text-white/55 transition-colors hover:border-white/60"
+                  className={`h-11 rounded-full border transition-all duration-150 ${
+                    day.isToday
+                      ? 'border-white/60 text-white bg-white/5'
+                      : 'border-white/35 text-white/55 hover:border-white/60'
+                  }`}
                   onClick={() => handleDaySelect(day.value)}
                 >
                   {day.value}

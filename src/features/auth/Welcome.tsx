@@ -6,12 +6,12 @@ const Welcome: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[var(--color-primary)] flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="h-screen w-full bg-[var(--color-primary)] flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Background gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-[#1a1526] opacity-80" />
       
       {/* Main content container */}
-      <div className={`relative z-10 flex flex-col items-center justify-center w-full max-w-[var(--welcome-max-width)] welcome-entrance`}>
+      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[var(--welcome-max-width)] welcome-entrance">
         {/* Logo container with glassmorphism effect */}
         <div className="w-[var(--welcome-logo-size)] h-[var(--welcome-logo-size)] rounded-full glass-logo flex items-center justify-center mb-8 welcome-logo">
           <Dumbbell className="w-12 h-12 text-white" />
