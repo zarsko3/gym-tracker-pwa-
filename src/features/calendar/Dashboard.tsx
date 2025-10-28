@@ -77,15 +77,25 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[var(--color-primary)] pb-24">
-      {/* Header */}
+      {/* Header with enhanced styling */}
       <div className="px-6 pt-12 pb-6">
-        <h1 className="text-figma-h1 text-white mb-1">{greeting}</h1>
-        <p className="text-figma-caption text-[var(--color-text-secondary)]">
-          {dateStr}
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-figma-h1 text-white mb-1">{greeting}</h1>
+            <p className="text-figma-caption text-[var(--color-text-secondary)]">
+              {dateStr}
+            </p>
+          </div>
+          {/* Profile indicator */}
+          <div className="w-10 h-10 rounded-full bg-[var(--color-pink)] flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">
+              {user?.displayName?.charAt(0) || 'U'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Today's Workout Card */}
+      {/* Today's Workout Card - Enhanced */}
       <div className="px-6 mb-6">
         <TodayWorkoutCard 
           todayWorkout={todayWorkout} 
@@ -93,19 +103,25 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats - Enhanced layout */}
       <div className="px-6 mb-6">
         <QuickStatsCard workouts={workouts} />
       </div>
 
-      {/* Categories */}
+      {/* Categories - Enhanced with better spacing */}
       <div className="px-6 mb-6">
         <CategoryCards workouts={workouts} />
       </div>
 
-      {/* Calendar Widget */}
+      {/* Calendar Widget - Enhanced styling */}
       <div className="px-6 mb-6">
         <div className="glass-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-figma-h3 text-white">Calendar</h3>
+            <button className="text-sm text-[var(--color-pink)] hover:text-[var(--color-light-pink)] transition-colors">
+              View All
+            </button>
+          </div>
           <MiniCalendar 
             workouts={workouts} 
             currentDate={today} 
@@ -114,9 +130,20 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Progress Chart */}
+      {/* Progress Chart - Enhanced with title */}
       <div className="px-6">
         <div className="glass-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-figma-h3 text-white">Progress</h3>
+            <div className="flex gap-2">
+              <button className="px-3 py-1 text-xs bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors">
+                Week
+              </button>
+              <button className="px-3 py-1 text-xs bg-[var(--color-pink)] rounded-full text-white">
+                Month
+              </button>
+            </div>
+          </div>
           <ProgressLineChart workouts={workouts} />
         </div>
       </div>

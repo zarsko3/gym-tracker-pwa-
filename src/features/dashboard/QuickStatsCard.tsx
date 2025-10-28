@@ -83,13 +83,20 @@ const QuickStatsCard: React.FC<QuickStatsCardProps> = ({ workouts }) => {
   ];
 
   return (
-    <div className="glass-card p-4 mb-6">
+    <div className="glass-card p-6 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-figma-h3 text-white">Quick Stats</h3>
+        <div className="w-2 h-2 bg-[var(--color-pink)] rounded-full"></div>
+      </div>
       <div className="grid grid-cols-3 gap-4">
         {stats.map((stat, idx) => (
-          <div key={idx} className="text-center">
-            <stat.icon className={`w-5 h-5 ${stat.color} mx-auto mb-2`} />
+          <div key={idx} className="text-center group">
+            <div className={`w-12 h-12 ${stat.color.replace('text-', 'bg-').replace('-400', '-500/20')} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            </div>
             <p className="text-2xl font-bold text-[var(--color-text-primary)]">{stat.value}</p>
             <p className="text-xs text-[var(--color-text-muted)] mt-1">{stat.label}</p>
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">{stat.unit}</p>
           </div>
         ))}
       </div>

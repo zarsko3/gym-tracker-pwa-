@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { TrendingUp, Zap } from 'lucide-react';
 import BottomNavigation from '../../components/BottomNavigation';
 
 ChartJS.register(
@@ -170,30 +171,40 @@ const Statistics: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[var(--color-primary)] pb-24">
-      {/* Header */}
+      {/* Header - Enhanced */}
       <div className="px-6 pt-12 pb-6">
-        <h1 className="text-figma-h1 text-white mb-1">Your Statistics</h1>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-figma-h1 text-white mb-1">Your Statistics</h1>
+            <p className="text-figma-caption text-[var(--color-text-secondary)]">
+              Track your fitness progress
+            </p>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-[var(--color-pink)] flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-white" />
+          </div>
+        </div>
       </div>
 
-      {/* Tab Buttons */}
+      {/* Tab Buttons - Enhanced */}
       <div className="px-6 mb-6">
-        <div className="flex gap-2">
+        <div className="flex gap-2 bg-[var(--color-card-dark)] p-1 rounded-2xl">
           <button
             onClick={() => setActiveTab('whole')}
-            className={`px-6 py-2 rounded-full text-sm font-medium ${
+            className={`flex-1 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
               activeTab === 'whole' 
-                ? 'bg-white text-[var(--color-primary)]' 
-                : 'bg-[var(--color-card-dark)] text-[var(--color-text-muted)]'
+                ? 'bg-white text-[var(--color-primary)] shadow-lg' 
+                : 'text-[var(--color-text-muted)] hover:text-white'
             }`}
           >
             Whole
           </button>
           <button
             onClick={() => setActiveTab('week')}
-            className={`px-6 py-2 rounded-full text-sm font-medium ${
+            className={`flex-1 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
               activeTab === 'week' 
-                ? 'bg-white text-[var(--color-primary)]' 
-                : 'bg-[var(--color-card-dark)] text-[var(--color-text-muted)]'
+                ? 'bg-white text-[var(--color-primary)] shadow-lg' 
+                : 'text-[var(--color-text-muted)] hover:text-white'
             }`}
           >
             Week
@@ -203,19 +214,71 @@ const Statistics: React.FC = () => {
 
       {/* Charts */}
       <div className="px-6 space-y-6">
-        {/* Calories Chart */}
-        <div className="glass-card p-6">
-          <h3 className="text-figma-h3 text-white mb-4">Calories</h3>
-          <div className="h-32">
-            <Bar data={getCaloriesData()} options={chartOptions} />
+        {/* Calories Chart - Enhanced */}
+        <div className="glass-card p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-pink)]/5 via-transparent to-[var(--color-yellow)]/5 pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-figma-h3 text-white">Calories Burned</h3>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[var(--color-pink)] rounded-full"></div>
+                <span className="text-sm text-[var(--color-text-secondary)]">Last 7 days</span>
+              </div>
+            </div>
+            <div className="h-32">
+              <Bar data={getCaloriesData()} options={chartOptions} />
+            </div>
+            <div className="flex items-center justify-between mt-4 text-sm">
+              <div className="text-[var(--color-text-secondary)]">
+                Avg: {Math.round(getCaloriesData().datasets[0].data.reduce((a, b) => a + b, 0) / 7)} cal/day
+              </div>
+              <div className="text-[var(--color-pink)] font-medium">
+                +12% vs last week
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Weight Chart */}
-        <div className="glass-card p-6">
-          <h3 className="text-figma-h3 text-white mb-4">Weight</h3>
-          <div className="h-32">
-            <Line data={getWeightData()} options={chartOptions} />
+        {/* Weight Chart - Enhanced */}
+        <div className="glass-card p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-yellow)]/5 via-transparent to-[var(--color-light-blue)]/5 pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-figma-h3 text-white">Weight Progress</h3>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[var(--color-yellow)] rounded-full"></div>
+                <span className="text-sm text-[var(--color-text-secondary)]">Last 7 days</span>
+              </div>
+            </div>
+            <div className="h-32">
+              <Line data={getWeightData()} options={chartOptions} />
+            </div>
+            <div className="flex items-center justify-between mt-4 text-sm">
+              <div className="text-[var(--color-text-secondary)]">
+                Current: 70.2 kg
+              </div>
+              <div className="text-[var(--color-yellow)] font-medium">
+                -0.3 kg this week
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Stats Cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="glass-card p-4 text-center">
+            <div className="w-12 h-12 bg-[var(--color-pink)]/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <TrendingUp className="w-6 h-6 text-[var(--color-pink)]" />
+            </div>
+            <p className="text-2xl font-bold text-white">15</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">Workouts this month</p>
+          </div>
+          <div className="glass-card p-4 text-center">
+            <div className="w-12 h-12 bg-[var(--color-yellow)]/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Zap className="w-6 h-6 text-[var(--color-yellow)]" />
+            </div>
+            <p className="text-2xl font-bold text-white">7</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">Day streak</p>
           </div>
         </div>
       </div>

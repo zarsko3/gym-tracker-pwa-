@@ -147,15 +147,6 @@ Implement the complete authentication flow including Signup, Login, Forgot Passw
 - `/otp-verification` (new) ✅
 - `/password-changed` (new) ✅
 
-### To-dos
-
-- [x] Extract exact design specifications from Figma Frame 10:47 (colors, typography, spacing, button styles)
-- [x] Update design tokens in tokens.css if any missing values are identified
-- [x] Implement Welcome component with pixel-perfect Figma match (layout, styling, buttons)
-- [x] Add entrance animations and micro-interactions to Welcome screen
-- [x] Verify and test navigation flow between Welcome, Login, Signup, and Dashboard
-- [x] Test responsive behavior across mobile, tablet, and desktop viewports
-
 ## Implementation Summary ✅ COMPLETED
 
 ### What Was Implemented
@@ -209,3 +200,12 @@ Implement the complete authentication flow including Signup, Login, Forgot Passw
 - ✅ Animations and transitions smooth and performant
 
 The complete registration screens implementation is now ready for production use!
+
+### To-dos
+
+- [x] Extract exact design specifications from Figma Frame 10:47 (colors, typography, spacing, button styles)
+- [x] Update design tokens in tokens.css if any missing values are identified
+- [x] Implement Welcome component with pixel-perfect Figma match (layout, styling, buttons)
+- [x] Add entrance animations and micro-interactions to Welcome screen
+- [x] Verify and test navigation flow between Welcome, Login, Signup, and Dashboard
+- [x] Test responsive behavior across mobile, tablet, and desktop viewports

@@ -176,10 +176,10 @@ const WorkoutScreen: React.FC<WorkoutScreenProps> = ({
   return (
     <div
       className="min-h-screen w-full flex items-start justify-center p-4"
-      style={{ background: "#e0ece9" }}
+      style={{ background: "linear-gradient(135deg, #e0ece9 0%, #d4e6e1 100%)" }}
     >
       <div
-        className="relative w-[360px] h-[760px] rounded-[28px] overflow-hidden"
+        className="relative w-[360px] h-[760px] rounded-[28px] overflow-hidden shadow-2xl"
         style={{ background: "linear-gradient(180deg, #2d2840 0%, #262135 60%)" }}
       >
         {/* Status Bar */}
@@ -196,63 +196,71 @@ const WorkoutScreen: React.FC<WorkoutScreenProps> = ({
         <div className="flex items-center justify-between px-6 pt-4">
           <button
             onClick={handleBack}
-            className="w-12 h-12 rounded-2xl bg-black/35 backdrop-blur flex items-center justify-center text-white"
+            className="w-12 h-12 rounded-2xl bg-black/35 backdrop-blur flex items-center justify-center text-white hover:bg-black/50 transition-colors"
           >
             ←
           </button>
 
-          {/* Timer ring */}
+          {/* Timer ring - Enhanced */}
           <div className="relative w-16 h-16">
             <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="4"/>
               <circle
                 cx="18" cy="18" r="16" fill="none"
-                stroke="rgba(255,255,255,.9)" strokeWidth="4"
+                stroke="url(#timerGradient)" strokeWidth="4"
                 strokeDasharray="100"
                 strokeDashoffset={dash}
                 strokeLinecap="round"
               />
             </svg>
+            <defs>
+              <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ff6b9d" />
+                <stop offset="100%" stopColor="#ffd966" />
+              </linearGradient>
+            </defs>
             <div className="absolute inset-0 grid place-items-center text-white text-xs font-semibold">
               {timerSeconds.toString().padStart(2, "0")}s
             </div>
           </div>
         </div>
 
-        {/* Title */}
+        {/* Title - Enhanced */}
         <div className="px-6 mt-8 text-center text-white">
-          <h1 className="text-xl font-extrabold leading-tight">{displayExerciseName}</h1>
+          <h1 className="text-xl font-extrabold leading-tight bg-gradient-to-r from-white to-[var(--color-light-pink)] bg-clip-text text-transparent">
+            {displayExerciseName}
+          </h1>
+          <p className="text-sm text-white/60 mt-2">Set {setIndex} of {displayExercises.length}</p>
         </div>
 
-        {/* Reps + Ruler */}
+        {/* Reps + Ruler - Enhanced */}
         <div className="px-6 mt-8 flex items-center justify-center gap-6">
           <div className="grid place-items-center">
-            <div className="text-white/80 text-sm mb-2">set {setIndex}</div>
-            <div className="w-16 h-12 rounded-xl bg-black/35 backdrop-blur grid place-items-center text-white font-bold">
+            <div className="text-white/80 text-sm mb-2">Set {setIndex}</div>
+            <div className="w-16 h-12 rounded-xl bg-gradient-to-br from-[var(--color-pink)]/20 to-[var(--color-yellow)]/20 backdrop-blur grid place-items-center text-white font-bold border border-white/10">
               <div className="text-[11px] leading-3 opacity-80">{displayReps}</div>
               <div className="text-[11px] leading-3">reps</div>
             </div>
           </div>
 
           <div className="flex-1">
-            <div className="text-white/80 text-sm text-center mb-2">kg</div>
+            <div className="text-white/80 text-sm text-center mb-2">Weight (kg)</div>
 
-            {/* Ruler */}
-            <div className="rounded-2xl px-3 py-2"
-                 style={{ background: "var(--color-card)" }}>
+            {/* Ruler - Enhanced */}
+            <div className="rounded-2xl px-3 py-2 bg-gradient-to-r from-[var(--color-card)] to-[var(--color-card)]/90 backdrop-blur-sm border border-white/10">
               <div className="relative">
                 <input
                   type="range"
                   min={min}
                   max={total}
                   value={displayWeight}
-                  className="w-full appearance-none bg-transparent"
+                  className="w-full appearance-none bg-transparent cursor-pointer"
                   style={{
                     WebkitAppearance: "none",
                   }}
                   onChange={(e) => setCurrentWeight(Number(e.target.value))}
                 />
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[#262135] font-bold text-lg">
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[#262135] font-bold text-lg bg-white/90 rounded-full w-8 h-8 flex items-center justify-center">
                   {displayWeight}
                 </div>
                 {/* tick marks */}
@@ -263,58 +271,67 @@ const WorkoutScreen: React.FC<WorkoutScreenProps> = ({
                 </div>
               </div>
             </div>
-
-            <div className="text-white/80 text-xs text-center mt-1">kg</div>
           </div>
         </div>
 
-        {/* Plus button */}
+        {/* Plus button - Enhanced */}
         <div className="grid place-items-center mt-8">
-          <button className="w-12 h-12 rounded-full bg-white/90 text-[#262135] text-2xl font-bold shadow-lg">
+          <button className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-pink)] to-[var(--color-yellow)] text-white text-2xl font-bold shadow-lg hover:scale-110 active:scale-95 transition-transform">
             +
           </button>
         </div>
 
-        {/* Pause pill */}
+        {/* Pause pill - Enhanced */}
         <div className="grid place-items-center mt-10">
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className="w-28 h-28 rounded-full grid place-items-center text-3xl font-bold shadow-lg"
-            style={{ background: "var(--color-card)", color: "#262135" }}
+            className="w-28 h-28 rounded-full grid place-items-center text-3xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-transform bg-gradient-to-br from-[var(--color-card)] to-[var(--color-card)]/80 backdrop-blur-sm border border-white/10"
           >
             {isPaused ? '▶' : '‖'}
           </button>
         </div>
 
-        {/* Bottom sheet */}
+        {/* Bottom sheet - Enhanced */}
         <div
           className="absolute left-0 right-0 bottom-0 px-5 pb-6 pt-6"
           style={{ background: "transparent" }}
         >
           <div
-            className="mx-auto rounded-[28px] shadow-xl backdrop-blur px-5 py-5"
+            className="mx-auto rounded-[28px] shadow-xl backdrop-blur px-5 py-5 border border-white/20"
             style={{
-              background: "rgba(255,255,255,.90)",
-              boxShadow: "0 20px 60px rgba(0,0,0,.35)",
+              background: "rgba(255,255,255,.95)",
+              boxShadow: "0 20px 60px rgba(0,0,0,.4)",
             }}
           >
-            <div className="text-[#262135]/35 text-sm mb-3">
-              Bench Press or Dumbbell Press
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-[#262135]/60 text-sm font-medium">
+                Exercise List
+              </div>
+              <div className="text-xs text-[#262135]/40">
+                {currentExerciseIndex + 1} of {displayExercises.length}
+              </div>
             </div>
 
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {displayExercises.map((label, i) => {
                 const active = i === currentExerciseIndex;
                 return (
                   <li
                     key={label}
                     className={[
-                      "w-full rounded-2xl px-4 py-3 text-sm font-semibold cursor-pointer transition-all",
-                      active ? "bg-[var(--color-accent)] text-[#262135]" : "bg-white text-[#262135]/90 hover:bg-gray-50"
+                      "w-full rounded-2xl px-4 py-3 text-sm font-semibold cursor-pointer transition-all duration-200",
+                      active 
+                        ? "bg-gradient-to-r from-[var(--color-pink)] to-[var(--color-yellow)] text-white shadow-lg" 
+                        : "bg-white text-[#262135]/90 hover:bg-gray-50 hover:shadow-md"
                     ].join(" ")}
                     onClick={() => setCurrentExerciseIndex(i)}
                   >
-                    {label}
+                    <div className="flex items-center justify-between">
+                      <span>{label}</span>
+                      {active && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
+                    </div>
                   </li>
                 );
               })}
