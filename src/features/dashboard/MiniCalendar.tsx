@@ -42,63 +42,54 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ workouts, currentDate, onDa
   };
 
   const weekStart = getWeekStartDate(selectedDate);
-  const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const DAY_NAMES = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <div className="card-figma">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-figma-h3 text-white">This Week</h3>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSelectedDate(new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000))}
-            className="w-8 h-8 rounded-full bg-[var(--color-card-light)] flex items-center justify-center"
-          >
-            <ChevronLeft className="w-4 h-4 text-white" />
-          </button>
-          <button
-            onClick={() => setSelectedDate(new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000))}
-            className="w-8 h-8 rounded-full bg-[var(--color-card-light)] flex items-center justify-center"
-          >
-            <ChevronRight className="w-4 h-4 text-white" />
-          </button>
-        </div>
+    <div className="glass-card p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-white">Calendar</h3>
+        <button className="text-sm text-[var(--color-pink)] hover:text-[var(--color-light-pink)] transition-colors">
+          View All
+        </button>
       </div>
 
+      {/* Day Names Row */}
+      <div className="grid grid-cols-7 gap-2 mb-4">
+        {DAY_NAMES.map((dayName, index) => (
+          <div key={dayName} className="text-center">
+            <div className={`text-sm font-semibold ${
+              index === 4 ? 'text-white' : 'text-white/32'
+            }`}>
+              {dayName}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-2">
         {Array.from({ length: 7 }, (_, i) => {
           const dayDate = new Date(weekStart);
           dayDate.setDate(weekStart.getDate() + i);
           
           const dateString = formatDateISO(dayDate);
-          const dayName = DAY_NAMES[dayDate.getDay()];
           const dateNum = dayDate.getDate();
           const workoutData = workouts[dateString];
           
           return (
             <div key={dateString} className="text-center">
-              <div className="text-xs text-[var(--color-text-muted)] mb-1">
-                {dayName}
-              </div>
               <div
                 onClick={() => onDayClick?.(dateString)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mx-auto cursor-pointer transition-all duration-200 hover:scale-110 ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mx-auto cursor-pointer transition-all duration-200 hover:scale-110 ${
                   isToday(dayDate) 
                     ? 'bg-[var(--color-pink)] text-white' 
                     : workoutData 
                       ? 'bg-[var(--color-card-light)] text-white' 
-                      : 'text-[var(--color-text-muted)]'
+                      : 'text-white/47'
                 }`}
               >
                 {dateNum}
               </div>
-              {workoutData && (
-                <div className={`w-1 h-1 rounded-full mx-auto mt-1 ${
-                  workoutData.workoutType === 'Push' ? 'bg-red-500' :
-                  workoutData.workoutType === 'Pull' ? 'bg-blue-500' :
-                  workoutData.workoutType === 'Legs' ? 'bg-green-500' :
-                  'bg-gray-500'
-                }`} />
-              )}
             </div>
           );
         })}

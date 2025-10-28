@@ -37,54 +37,31 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({ todayWorkout, today
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-pink)]/10 via-transparent to-[var(--color-yellow)]/10 pointer-events-none" />
       
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4 relative z-10">
-        <div>
-          <p className="text-figma-caption text-[var(--color-text-secondary)]">Today's Workout</p>
-          <h2 className="text-figma-h2 text-[var(--color-text-primary)] mt-1">
-            {todayWorkout?.workoutType || 'Rest Day'}
-          </h2>
-        </div>
-        {isCompleted && (
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 rounded-full backdrop-blur-sm">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            <span className="text-sm font-medium text-green-400">Completed</span>
+      {/* Exercise Details - Matching Figma */}
+      <div className="relative z-10">
+        <h2 className="text-lg font-medium text-white mb-2">Push Up</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-4">20 reps , 3 sets with 10 sec rest</p>
+        
+        {/* Weight Display */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-[var(--color-pink)] rounded-full"></div>
+            <span className="text-sm text-[var(--color-text-secondary)]">Weight</span>
           </div>
-        )}
+          <div className="bg-[var(--color-yellow)]/20 px-3 py-1 rounded-lg">
+            <span className="text-sm font-semibold text-[var(--color-primary)]">505 KG</span>
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <button
+          onClick={handleStartWorkout}
+          className="btn-figma-primary w-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+        >
+          <Play className="w-5 h-5" />
+          Start Workout
+        </button>
       </div>
-
-      {/* Quick Stats */}
-      {todayWorkout && todayWorkout.workoutType !== 'Rest' && (
-        <div className="grid grid-cols-3 gap-4 mb-6 relative z-10">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--color-text-primary)]">
-              {todayWorkout.exercises.length}
-            </p>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">Exercises</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--color-text-primary)]">
-              {calculateSetsCompleted(todayWorkout.exercises)}/{calculateTotalSets(todayWorkout.exercises)}
-            </p>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">Sets</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--color-text-primary)]">
-              {calculateTotalVolume(todayWorkout.exercises).toLocaleString()}
-            </p>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">Volume (kg)</p>
-          </div>
-        </div>
-      )}
-
-      {/* CTA Button */}
-      <button
-        onClick={handleStartWorkout}
-        className="btn-figma-primary w-full flex items-center justify-center gap-2 relative z-10 hover:scale-[1.02] active:scale-[0.98] transition-transform"
-      >
-        <Play className="w-5 h-5" />
-        {isCompleted ? 'View Workout' : todayWorkout ? 'Continue Workout' : 'Start Workout'}
-      </button>
     </div>
   );
 };
