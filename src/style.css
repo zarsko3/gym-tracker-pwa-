@@ -280,6 +280,92 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Workout Screen Slider Styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: rgba(255, 255, 255, 0.2);
+  height: 8px;
+  border-radius: 4px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FF6B9D;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.6);
+}
+
+.slider::-moz-range-track {
+  background: rgba(255, 255, 255, 0.2);
+  height: 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: #FF6B9D;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.6);
+}
+
+/* Workout Selection Popup Animations */
+.workout-popup-enter {
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+}
+
+.workout-popup-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: all 300ms ease-out;
+}
+
+.workout-popup-exit {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.workout-popup-exit-active {
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+  transition: all 200ms ease-in;
+}
+
+.workout-option-hover {
+  transition: all 200ms ease;
+}
+
+.workout-option-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
 /* Bottom Navigation from Figma */
 .bottom-nav-figma {
   background: var(--color-card-dark);

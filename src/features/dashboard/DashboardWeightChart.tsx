@@ -94,15 +94,15 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
   const activePoint = points[activeIndex];
 
   return (
-    <div className="relative rounded-[32px] border border-white/14 bg-[rgba(27,21,48,0.85)] px-6 pt-6 pb-8 shadow-[0_22px_60px_rgba(6,2,25,0.45)] backdrop-blur">
-      <div className="relative flex items-center justify-between mb-4">
+    <div className="relative rounded-[28px] border border-white/10 bg-[rgba(27,21,48,0.85)] px-6 pt-6 pb-6 shadow-[0_16px_40px_rgba(6,2,25,0.4)] backdrop-blur">
+      <div className="relative flex items-center justify-between mb-5">
         <div>
-          <p className="text-[15px] font-semibold text-white">{title}</p>
+          <p className="text-[16px] font-bold text-white">{title}</p>
           <p className="mt-1 text-[12px] font-medium text-white/60">{description}</p>
         </div>
       </div>
 
-      <div className="relative h-[180px]">
+      <div className="relative h-[175px]">
         <svg
           viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
           className="h-full w-full"
@@ -110,12 +110,12 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
         >
           <defs>
             <linearGradient id="dashboardChartFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.16)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+              <stop offset="0%" stopColor="rgba(255,255,255,0.18)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.01)" />
             </linearGradient>
             <linearGradient id="dashboardChartStroke" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#9DE4FF" />
-              <stop offset="54%" stopColor="#B6C4FF" />
+              <stop offset="50%" stopColor="#B6C4FF" />
               <stop offset="100%" stopColor="#FFFFFF" />
             </linearGradient>
           </defs>
@@ -129,7 +129,7 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
               d={linePath}
               fill="none"
               stroke="url(#dashboardChartStroke)"
-              strokeWidth={3}
+              strokeWidth={2.5}
               strokeLinecap="round"
             />
           )}
@@ -141,17 +141,17 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
                 x2={activePoint.x}
                 y1={activePoint.y}
                 y2={VIEWBOX_HEIGHT - PADDING_BOTTOM + 18}
-                stroke="rgba(255,255,255,0.25)"
-                strokeWidth={1.5}
-                strokeDasharray="4 5"
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth={1.2}
+                strokeDasharray="3 4"
               />
               <circle
                 cx={activePoint.x}
                 cy={activePoint.y}
-                r={6}
+                r={5.5}
                 fill="#FAF0A1"
                 stroke="#1C132F"
-                strokeWidth={2.5}
+                strokeWidth={2}
               />
             </g>
           )}
@@ -163,21 +163,21 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
             style={{
               left: `${(activePoint.x / VIEWBOX_WIDTH) * 100}%`,
               top: `${(activePoint.y / VIEWBOX_HEIGHT) * 100}%`,
-              transform: 'translate(-50%, -75%)',
+              transform: 'translate(-50%, -80%)',
             }}
           >
-            <div className="relative rounded-full bg-[#FAF0A1] px-5 py-1.5 text-[12px] font-semibold text-[#1C132F] shadow-[0_16px_40px_rgba(250,240,161,0.38)]">
+            <div className="relative rounded-full bg-[#FAF0A1] px-5 py-1.5 text-[12px] font-bold text-[#1C132F] shadow-[0_8px_24px_rgba(250,240,161,0.35)]">
               {activeValueLabel}
-              <span className="absolute -bottom-[6px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[#FAF0A1]" />
+              <span className="absolute -bottom-[5px] left-1/2 h-[10px] w-[10px] -translate-x-1/2 rotate-45 bg-[#FAF0A1]" />
             </div>
-            <div className="h-6 w-px bg-[#FAF0A1]/70" />
+            <div className="h-4 w-[1px] bg-[#FAF0A1]/60" />
           </div>
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-7 text-[11px] font-medium text-white/50">
+      <div className="mt-4 grid grid-cols-7 text-[11px] font-medium text-white/45">
         {data.map((point, index) => (
-          <span key={`${point.axisLabel}-${index}`} className={`text-center ${index === activeIndex ? 'text-white' : undefined}`}>
+          <span key={`${point.axisLabel}-${index}`} className={`text-center ${index === activeIndex ? 'text-white font-semibold' : undefined}`}>
             {point.axisLabel}
           </span>
         ))}

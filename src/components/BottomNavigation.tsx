@@ -19,7 +19,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab, classNam
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <div className="flex items-center justify-between rounded-[36px] bg-[rgba(32,24,52,0.85)] px-7 py-5 shadow-[0_22px_52px_rgba(6,2,25,0.45)] backdrop-blur-lg w-full max-w-[390px]">
+      <div className="flex items-center justify-between rounded-[32px] bg-[rgba(32,24,52,0.9)] px-6 py-4 shadow-[0_16px_40px_rgba(6,2,25,0.4)] backdrop-blur-lg w-full max-w-[390px]">
         {tabs.map(({ path, icon: Icon, label }) => {
           const isActive = 
             (activeTab === 'home' && path === '/dashboard') ||
@@ -31,12 +31,12 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab, classNam
               to={path}
               className="flex flex-col items-center"
             >
-              <div className={`grid h-[52px] w-[52px] place-items-center rounded-full border ${
+              <div className={`grid h-[48px] w-[48px] place-items-center rounded-full border ${
                 isActive
-                  ? 'border-white bg-white text-[#251B3D] shadow-[0_12px_30px_rgba(255,255,255,0.38)]'
-                  : 'border-white/8 bg-white/5 text-white/65'
+                  ? 'border-white bg-white text-[#251B3D] shadow-[0_8px_24px_rgba(255,255,255,0.35)]'
+                  : 'border-white/10 bg-white/5 text-white/60'
               }`}>
-                <Icon className={`h-[20px] w-[20px]`} strokeWidth={1.6} />
+                <Icon className={`h-[18px] w-[18px]`} strokeWidth={1.8} />
               </div>
             </Link>
           );
