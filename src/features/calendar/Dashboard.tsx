@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../services/firebase';
-import IOSHeader from '../../components/iOSHeader';
+import MiniCalendar from '../dashboard/MiniCalendar';
+import ProgressLineChart from '../dashboard/ProgressLineChart';
 import TodayWorkoutCard from '../dashboard/TodayWorkoutCard';
 import QuickStatsCard from '../dashboard/QuickStatsCard';
 import CategoryCards from '../dashboard/CategoryCards';
 import RecentActivityList from '../dashboard/RecentActivityList';
-import Calendar from './Calendar';
-import VolumeChart from '../progress/VolumeChart';
-import { BarChart3, Upload } from 'lucide-react';
+import BottomNavigation from '../../components/BottomNavigation';
+import WorkoutSelectionMenu from '../workout/WorkoutSelectionMenu';
 
 interface WorkoutData {
   date: string;
@@ -29,6 +28,7 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const [workouts, setWorkouts] = useState<Record<string, WorkoutData>>({});
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -52,71 +52,87 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
         <div className="spinner"></div>
       </div>
     );
   }
 
-  const today = new Date().toISOString().split('T')[0];
-  const todayWorkout = workouts[today];
+  const today = new Date();
+  const todayDateStr = today.toISOString().split('T')[0];
+  const greeting = `Hi, ${user?.displayName || 'User'}`;
+  const dateStr = today.toLocaleDateString('en-US', { 
+    day: 'numeric',
+    month: 'long', 
+    year: 'numeric' 
+  });
+
+  const handleDayClick = (dateString: string) => {
+    console.log('Dashboard day clicked:', dateString);
+    setSelectedDate(dateString);
+  };
+
+  // Get today's workout
+  const todayWorkout = workouts[todayDateStr];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      <IOSHeader 
-        title="Dashboard"
-        rightAction={
-          <div className="flex items-center gap-2">
-            <Link to="/progress" className="btn-ios-stepper w-11 h-11">
-              <BarChart3 className="w-5 h-5" />
-            </Link>
-            <Link to="/upload-data" className="btn-ios-stepper w-11 h-11">
-              <Upload className="w-5 h-5" />
-            </Link>
-          </div>
-        }
-      />
+    <div className="min-h-screen bg-[var(--color-primary)] pb-24">
+      {/* Header */}
+      <div className="px-6 pt-12 pb-6">
+        <h1 className="text-figma-h1 text-white mb-1">{greeting}</h1>
+        <p className="text-figma-caption text-[var(--color-text-secondary)]">
+          {dateStr}
+        </p>
+      </div>
 
-      <main className="container-responsive py-4 md:py-6 lg:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content - Left/Top */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Today's Workout - Prominent */}
-            <TodayWorkoutCard 
-              todayWorkout={todayWorkout}
-              todayDate={today}
-            />
+      {/* Today's Workout Card */}
+      <div className="px-6 mb-6">
+        <TodayWorkoutCard 
+          todayWorkout={todayWorkout} 
+          todayDate={todayDateStr} 
+        />
+      </div>
 
-            {/* Quick Stats */}
-            <QuickStatsCard workouts={workouts} />
+      {/* Quick Stats */}
+      <div className="px-6 mb-6">
+        <QuickStatsCard workouts={workouts} />
+      </div>
 
-            {/* Category Cards */}
-            <CategoryCards workouts={workouts} />
+      {/* Categories */}
+      <div className="px-6 mb-6">
+        <CategoryCards workouts={workouts} />
+      </div>
 
-            {/* Calendar Section */}
-            <div className="card-modern p-6">
-              <h3 className="text-heading-md text-white mb-4">Calendar</h3>
-              <Calendar workouts={workouts} />
-            </div>
-
-            {/* Volume Chart */}
-            <div className="card-modern p-6">
-              <VolumeChart workouts={workouts} weeks={4} />
-            </div>
-          </div>
-
-          {/* Sidebar - Desktop Only */}
-          <div className="hidden lg:block space-y-6">
-            <div className="card-modern p-6 sticky top-4">
-              <h3 className="text-heading-md text-white mb-4">Recent Activity</h3>
-              <RecentActivityList workouts={workouts} />
-            </div>
-          </div>
+      {/* Calendar Widget */}
+      <div className="px-6 mb-6">
+        <div className="glass-card p-6">
+          <MiniCalendar 
+            workouts={workouts} 
+            currentDate={today} 
+            onDayClick={handleDayClick}
+          />
         </div>
-      </main>
+      </div>
+
+      {/* Progress Chart */}
+      <div className="px-6">
+        <div className="glass-card p-6">
+          <ProgressLineChart workouts={workouts} />
+        </div>
+      </div>
+
+      {/* Workout Selection Menu */}
+      {selectedDate && (
+        <WorkoutSelectionMenu
+          date={selectedDate}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
+
+      {/* Bottom Navigation */}
+      <BottomNavigation activeTab="home" />
     </div>
   );
 };
 
 export default Dashboard;
-

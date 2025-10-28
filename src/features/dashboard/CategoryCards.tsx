@@ -93,8 +93,8 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ workouts }) => {
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-heading-md text-white">Categories</h3>
-        <button className="text-sm text-indigo-400 hover:text-indigo-300">
+        <h3 className="text-figma-h3 text-[var(--color-text-primary)]">Categories</h3>
+        <button className="text-sm text-[var(--color-pink)] hover:text-[var(--color-light-pink)]">
           View All
         </button>
       </div>
@@ -108,18 +108,18 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ workouts }) => {
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category)}
-              className="card-modern p-4 text-left hover:scale-[1.02] active:scale-[0.98] transition-transform"
+              className="glass-card p-4 text-left hover:scale-[1.02] active:scale-[0.98] transition-transform"
             >
               <div className={`w-12 h-12 ${category.bgColor} rounded-xl flex items-center justify-center mb-3`}>
                 <Icon className={`w-6 h-6 ${category.color}`} />
               </div>
-              <h4 className="text-base font-semibold text-white mb-1">
+              <h4 className="text-base font-semibold text-[var(--color-text-primary)] mb-1">
                 {category.name}
               </h4>
-              <p className="text-xs text-gray-400 mb-2">
+              <p className="text-xs text-[var(--color-text-secondary)] mb-2">
                 {category.description}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 {recentWorkouts} workouts this month
               </p>
             </button>

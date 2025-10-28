@@ -1,0 +1,15 @@
+# Cursor Rules for GYMZARSKI Project
+
+## MCP Configuration
+The project uses the Figma Context MCP server for design integration.
+
+## Design System
+- Use Figma design tokens from src/styles/tokens.css
+- Follow glassmorphism design patterns
+- Maintain pixel-perfect implementation from Figma designs
+
+## Code Style
+- Use TypeScript for all components
+- Follow React best practices
+- Use Tailwind CSS for styling
+- Implement responsive design patterns

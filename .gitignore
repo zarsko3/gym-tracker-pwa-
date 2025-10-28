@@ -40,3 +40,9 @@ registerSW.js
 
 # TypeScript
 *.tsbuildinfo
+
+# Sensitive files
+MCP_TROUBLESHOOTING.md
+mcp-backup.json
+mcp.json
+*.tokens.json

@@ -1,136 +1,354 @@
 @import 'tailwindcss';
 
-/* Modern Design System Variables */
+/* Figma Design System - Complete Implementation */
 :root {
-  /* Base colors - enhanced dark theme */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #13131a;
-  --bg-tertiary: #1a1a24;
-  --bg-card: #1e1e2e;
-  --bg-card-elevated: #24243a;
+  /* Figma Design Tokens */
+  --color-primary: #262135; /* Main background - dark purple */
+  --color-strokes: #d9d9d9; /* Border/stroke color */
   
-  /* Accent colors */
-  --accent-primary: #6366f1; /* indigo-500 */
-  --accent-primary-hover: #4f46e5; /* indigo-600 */
-  --accent-secondary: #8b5cf6; /* violet-500 */
+  /* Extended palette from Figma */
+  --color-card-dark: #332e45;
+  --color-card-light: #3d3852;
+  --color-pink: #ff6b9d;
+  --color-yellow: #ffd966;
+  --color-light-blue: #a7e8f5;
+  --color-light-pink: #ffc6d9;
   
-  /* Category colors */
-  --category-push: #ef4444; /* red-500 */
-  --category-pull: #3b82f6; /* blue-500 */
-  --category-legs: #22c55e; /* green-500 */
-  --category-warmup: #f59e0b; /* amber-500 */
-  --category-cardio: #ec4899; /* pink-500 */
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.6);
+  --color-text-muted: rgba(255, 255, 255, 0.4);
   
-  /* Borders & shadows */
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-medium: rgba(255, 255, 255, 0.1);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  /* Figma shadows */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-button: 0 2px 12px rgba(0, 0, 0, 0.3);
+  
+  /* Border radius - exact from Figma */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  
+  /* Spacing - exact from Figma */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
 }
 
-/* Modern card styles */
-.card-modern {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Glassmorphism effect from Figma */
+.glass-card {
+  background: rgba(51, 46, 69, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
 }
 
-.card-modern:hover {
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
 }
 
-.card-elevated {
-  background: var(--bg-card-elevated);
-  box-shadow: var(--shadow-md);
+.glass-card-strong {
+  background: rgba(38, 33, 53, 0.8);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* Gradient overlays for depth */
-.gradient-overlay {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
-}
-
-.glass-effect {
-  background: rgba(30, 30, 46, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Typography scale */
-.text-display {
-  font-size: clamp(2rem, 5vw, 3rem);
+/* Figma Typography - Pixel Perfect */
+.text-figma-h1 {
+  font-size: 32px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 38px;
   letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
-.text-heading-xl {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+.text-figma-h2 {
+  font-size: 24px;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  line-height: 32px;
+  color: var(--color-text-primary);
 }
 
-.text-heading-lg {
-  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+.text-figma-h3 {
+  font-size: 18px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 24px;
+  color: var(--color-text-primary);
 }
 
-.text-heading-md {
-  font-size: 1.125rem;
+.text-figma-body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--color-text-primary);
+}
+
+.text-figma-caption {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--color-text-secondary);
+}
+
+/* Responsive Typography */
+@media (max-width: 390px) {
+  .text-figma-h1 {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  
+  .text-figma-h2 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+  
+  .text-figma-h3 {
+    font-size: 16px;
+    line-height: 22px;
+  }
+}
+
+/* Figma Card Styles */
+.card-figma {
+  background: var(--color-card-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.card-figma-light {
+  background: var(--color-yellow);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.card-figma-pink {
+  background: var(--color-light-pink);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+/* Figma Button Styles */
+.btn-figma-primary {
+  background: white;
+  color: var(--color-primary);
+  padding: 16px 32px;
+  border-radius: var(--radius-xl);
   font-weight: 600;
-  line-height: 1.4;
+  font-size: 16px;
+  box-shadow: var(--shadow-button);
+  transition: all 0.2s ease;
 }
 
-/* Label styles */
-.label-category {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* Modern calendar styling */
-.calendar-day {
-  @apply rounded-xl p-3 cursor-pointer flex flex-col items-center justify-center;
-  min-height: 72px;
-  border: 1px solid var(--border-subtle);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.calendar-day:hover {
+.btn-figma-primary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* Category color utilities */
-.bg-category-push { background-color: var(--category-push); }
-.bg-category-pull { background-color: var(--category-pull); }
-.bg-category-legs { background-color: var(--category-legs); }
-.bg-category-warmup { background-color: var(--category-warmup); }
+.btn-figma-secondary {
+  background: transparent;
+  color: white;
+  padding: 16px 32px;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
 
-.text-category-push { color: var(--category-push); }
-.text-category-pull { color: var(--category-pull); }
-.text-category-legs { color: var(--category-legs); }
-.text-category-warmup { color: var(--category-warmup); }
+.btn-figma-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
 
-/* Workout markers with modern styling */
-.workout-push { 
-  background: linear-gradient(90deg, var(--category-push) 0%, rgba(239, 68, 68, 0.5) 100%);
+/* Welcome Screen Specific Styles */
+.welcome-entrance {
+  animation: welcomeFadeIn var(--duration-entrance) ease-out forwards;
 }
-.workout-pull { 
-  background: linear-gradient(90deg, var(--category-pull) 0%, rgba(59, 130, 246, 0.5) 100%);
+
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.workout-legs { 
-  background: linear-gradient(90deg, var(--category-legs) 0%, rgba(34, 197, 94, 0.5) 100%);
+
+/* Auth Screen Specific Styles */
+.auth-entrance {
+  animation: authFadeIn var(--duration-entrance) ease-out forwards;
 }
+
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-logo {
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Glassmorphism effect for logo container */
+.glass-logo {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Welcome Screen */
+@media (max-width: 480px) {
+  .welcome-entrance {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .glass-logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .glass-logo svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .welcome-entrance {
+    max-width: 420px;
+  }
+}
+
+/* Input styles from Figma */
+.input-figma {
+  background: var(--color-card-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  color: white;
+  font-size: 16px;
+  width: 100%;
+}
+
+.input-figma::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input-figma:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Bottom Navigation from Figma */
+.bottom-nav-figma {
+  background: var(--color-card-dark);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Workout Screen Slider - Pixel Perfect Figma Match */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 6px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #262135;
+  border: 2px solid #fff;
+  margin-top: -7px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #262135;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
+/* Figma Spacing Utilities */
+.p-figma-xs { padding: var(--spacing-xs); }
+.p-figma-sm { padding: var(--spacing-sm); }
+.p-figma-md { padding: var(--spacing-md); }
+.p-figma-lg { padding: var(--spacing-lg); }
+.p-figma-xl { padding: var(--spacing-xl); }
+.p-figma-2xl { padding: var(--spacing-2xl); }
+
+.m-figma-xs { margin: var(--spacing-xs); }
+.m-figma-sm { margin: var(--spacing-sm); }
+.m-figma-md { margin: var(--spacing-md); }
+.m-figma-lg { margin: var(--spacing-lg); }
+.m-figma-xl { margin: var(--spacing-xl); }
+.m-figma-2xl { margin: var(--spacing-2xl); }
+
+.gap-figma-xs { gap: var(--spacing-xs); }
+.gap-figma-sm { gap: var(--spacing-sm); }
+.gap-figma-md { gap: var(--spacing-md); }
+.gap-figma-lg { gap: var(--spacing-lg); }
+.gap-figma-xl { gap: var(--spacing-xl); }
+.gap-figma-2xl { gap: var(--spacing-2xl); }
 
 /* iOS Safe Areas and Typography */
 html, body { 
@@ -161,14 +379,10 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* iOS Dynamic Type support - using Tailwind classes instead of custom */
-
 /* iOS minimum text size enforcement */
 * {
   font-size: max(11px, 1em);
 }
-
-/* iOS-optimized component styles */
 
 /* Calendar container */
 .calendar-container {
@@ -284,46 +498,6 @@ body {
     @apply text-indigo-400;
 }
 
-/* iOS modal and sheet styles */
-.modal-backdrop {
-  @apply fixed inset-0 bg-black/75 flex items-center justify-center z-50 transition-opacity duration-300;
-}
-
-.modal-content {
-    @apply bg-gray-800 rounded-t-3xl shadow-xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-95;
-    margin-bottom: env(safe-area-inset-bottom);
-}
-
-.modal-hidden {
-    @apply opacity-0 pointer-events-none;
-}
-
-.modal-visible {
-    @apply opacity-100 scale-100;
-}
-
-/* iOS bottom sheet */
-.bottom-sheet {
-    @apply fixed bottom-0 left-0 right-0 bg-gray-800 rounded-t-3xl shadow-2xl;
-    padding-bottom: env(safe-area-inset-bottom);
-    transform: translateY(100%);
-    transition: transform 0.3s ease-out;
-}
-
-.bottom-sheet.open {
-    transform: translateY(0);
-}
-
-/* Loading Spinner */
-.spinner {
-    @apply w-12 h-12 border-4 border-t-indigo-500 border-gray-600 rounded-full animate-spin;
-}
-
-/* Helper for hiding elements */
-.hidden {
-    display: none;
-}
-
 /* Inline panel animations */
 @keyframes slide-down {
     from {
@@ -346,49 +520,6 @@ body {
     z-index: 10; /* Ensure it appears above other elements */
 }
 
-/* Gym-optimized UI styles */
-.workout-active {
-    background: #0a0a0a;
-}
-
-.btn-primary {
-    @apply bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg;
-    min-height: 56px;
-    font-size: 18px;
-}
-
-.workout-input {
-    @apply bg-gray-800 text-white text-3xl font-bold text-center rounded-lg p-4;
-    min-height: 64px;
-    border: 2px solid transparent;
-}
-
-.workout-input:focus {
-    border-color: #6366f1;
-    outline: none;
-}
-
-.timer-display {
-    @apply text-4xl font-mono font-bold text-indigo-400;
-}
-
-/* Enhanced touch targets for mobile */
-.touch-target {
-    min-height: 48px;
-    min-width: 48px;
-}
-
-/* High contrast buttons for gym lighting */
-.btn-gym {
-    @apply font-bold py-3 px-4 rounded-lg shadow-lg transition-all;
-    min-height: 48px;
-    font-size: 16px;
-}
-
-.btn-gym:active {
-    transform: scale(0.95);
-}
-
 /* Set completion indicators */
 .set-complete {
     @apply bg-green-600 text-white;
@@ -405,27 +536,6 @@ body {
 
 .rest-timer-complete {
     @apply bg-green-900/30 border border-green-500/50;
-}
-
-/* iOS haptic feedback classes */
-.haptic-light {
-    /* Light impact feedback */
-}
-
-.haptic-medium {
-    /* Medium impact feedback */
-}
-
-.haptic-heavy {
-    /* Heavy impact feedback */
-}
-
-.haptic-success {
-    /* Success notification feedback */
-}
-
-.haptic-error {
-    /* Error notification feedback */
 }
 
 /* Responsive typography scale */

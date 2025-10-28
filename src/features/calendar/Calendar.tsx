@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import InlineWorkoutPanel from './InlineWorkoutPanel';
+import WorkoutSelectionMenu from '../workout/WorkoutSelectionMenu';
 
 interface WorkoutData {
   date: string;
@@ -23,7 +23,7 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [expandedDate, setExpandedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const getWeekStartDate = (date: Date) => {
     const d = new Date(date);
@@ -71,7 +71,9 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
   };
 
   const handleDayClick = (dateString: string) => {
-    setExpandedDate(expandedDate === dateString ? null : dateString);
+    console.log('Calendar day clicked:', dateString);
+    console.log('Setting selected date to:', dateString);
+    setSelectedDate(dateString);
   };
 
   const weekStart = getWeekStartDate(currentDate);
@@ -120,11 +122,15 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
           return (
             <div key={dateString}>
               <div
-                onClick={() => handleDayClick(dateString)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Day clicked!', dateString);
+                  handleDayClick(dateString);
+                }}
                 className={`
-                  calendar-day relative overflow-hidden
+                  calendar-day relative overflow-hidden cursor-pointer
                   ${isToday(dayDate) ? 'ring-2 ring-indigo-500 bg-indigo-500/10' : 'bg-gray-800/50'}
-                  ${expandedDate === dateString ? 'ring-2 ring-indigo-400 scale-105' : ''}
                   hover:bg-gray-700/70 transition-all duration-200
                 `}
                 role="button"
@@ -132,10 +138,12 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
+                    console.log('Day key pressed!', dateString);
                     handleDayClick(dateString);
                   }
                 }}
                 aria-label={`${dayName} ${dateNum}${workoutData ? ` - ${workoutData.workoutType} workout` : ''}`}
+                style={{ pointerEvents: 'auto' }}
               >
                 <span className="text-xs sm:text-sm font-medium text-gray-400 mb-1">
                   {dayName}
@@ -154,13 +162,12 @@ const Calendar: React.FC<CalendarProps> = ({ workouts }) => {
         })}
       </div>
       
-      {/* Workout panel - positioned below the calendar grid */}
-      {expandedDate && (
-        <div className="mt-6">
-          <InlineWorkoutPanel 
-            date={expandedDate}
-            existingWorkout={workouts[expandedDate]}
-            onClose={() => setExpandedDate(null)}
+      {/* Workout Selection Menu */}
+      {selectedDate && (
+        <div>
+          <WorkoutSelectionMenu
+            date={selectedDate}
+            onClose={() => setSelectedDate(null)}
           />
         </div>
       )}

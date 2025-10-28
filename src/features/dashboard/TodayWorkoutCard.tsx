@@ -33,12 +33,12 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({ todayWorkout, today
   };
 
   return (
-    <div className="card-modern card-elevated gradient-overlay p-6 mb-6">
+    <div className="glass-card p-6 mb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="label-category">Today's Workout</p>
-          <h2 className="text-heading-xl text-white mt-1">
+          <p className="text-figma-caption text-[var(--color-text-secondary)]">Today's Workout</p>
+          <h2 className="text-figma-h2 text-[var(--color-text-primary)] mt-1">
             {todayWorkout?.workoutType || 'Rest Day'}
           </h2>
         </div>
@@ -54,22 +54,22 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({ todayWorkout, today
       {todayWorkout && todayWorkout.workoutType !== 'Rest' && (
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="text-center">
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-[var(--color-text-primary)]">
               {todayWorkout.exercises.length}
             </p>
-            <p className="text-xs text-gray-400 mt-1">Exercises</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">Exercises</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-[var(--color-text-primary)]">
               {calculateSetsCompleted(todayWorkout.exercises)}/{calculateTotalSets(todayWorkout.exercises)}
             </p>
-            <p className="text-xs text-gray-400 mt-1">Sets</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">Sets</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-[var(--color-text-primary)]">
               {calculateTotalVolume(todayWorkout.exercises).toLocaleString()}
             </p>
-            <p className="text-xs text-gray-400 mt-1">Volume (kg)</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">Volume (kg)</p>
           </div>
         </div>
       )}
@@ -77,7 +77,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({ todayWorkout, today
       {/* CTA Button */}
       <button
         onClick={handleStartWorkout}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20"
+        className="btn-figma-primary w-full flex items-center justify-center gap-2"
       >
         <Play className="w-5 h-5" />
         {isCompleted ? 'View Workout' : todayWorkout ? 'Continue Workout' : 'Start Workout'}

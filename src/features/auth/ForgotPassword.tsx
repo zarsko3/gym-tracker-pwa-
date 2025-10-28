@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../services/firebase';
 import { ChevronLeft } from 'lucide-react';
 
-const Signup: React.FC = () => {
+const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,22 +19,10 @@ const Signup: React.FC = () => {
       setError('Please enter a valid email address');
       return false;
     }
-    if (!password) {
-      setError('Password is required');
-      return false;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
     return true;
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -47,14 +33,16 @@ const Signup: React.FC = () => {
     setError('');
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/onboarding-step1');
+      await sendPasswordResetEmail(auth, email);
+      // Navigate to OTP Verification instead of showing success
+      navigate('/otp-verification', { state: { email } });
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[var(--color-primary)] px-6 py-12 relative overflow-hidden">
@@ -73,39 +61,24 @@ const Signup: React.FC = () => {
 
         {/* Title */}
         <h1 className="text-figma-h1 text-white mb-2">
-          Hello! Register to get<br />started
+          Forgot Password?
         </h1>
 
-        {/* Form */}
-        <form onSubmit={handleSignup} className="mt-8 space-y-4">
-          <div className="space-y-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-figma w-full"
-              required
-            />
-            
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-figma w-full"
-              required
-            />
+        {/* Subtitle */}
+        <p className="text-figma-body text-[var(--color-text-secondary)] mb-8">
+          Don't worry! It happens. Please enter the address associated with your account.
+        </p>
 
-            <input
-              type="password"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="input-figma w-full"
-              required
-            />
-          </div>
+        {/* Form */}
+        <form onSubmit={handleForgotPassword} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input-figma w-full"
+            required
+          />
 
           {error && (
             <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
@@ -118,13 +91,13 @@ const Signup: React.FC = () => {
             disabled={loading}
             className="btn-figma-primary w-full mt-6 transform transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            {loading ? 'Creating account...' : 'Register'}
+            {loading ? 'Sending...' : 'Send Code'}
           </button>
         </form>
 
         {/* Footer link */}
         <p className="text-center text-figma-body text-[var(--color-text-secondary)] mt-6">
-          Already have an account?{' '}
+          Remember your password?{' '}
           <Link to="/login" className="text-white font-semibold hover:text-[var(--color-text-primary)] transition-colors duration-200">
             Login Now
           </Link>
@@ -134,4 +107,4 @@ const Signup: React.FC = () => {
   );
 };
 
-export default Signup;
+export default ForgotPassword;
