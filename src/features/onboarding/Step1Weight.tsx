@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import ScreenLayout from '../../components/ScreenLayout';
 
 const Step1Weight: React.FC = () => {
   const [weight, setWeight] = useState(70);
@@ -8,56 +9,50 @@ const Step1Weight: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-100 px-6 py-12">
-      {/* Progress dots */}
-      <div className="flex gap-2 justify-center mb-8">
-        <div className="w-2 h-2 rounded-full bg-[var(--color-primary)]"></div>
-        <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+    <ScreenLayout contentClassName="flex h-full flex-col px-6 py-12 text-white">
+      <div className="mb-8 flex justify-center gap-2">
+        <div className="h-2 w-2 rounded-full bg-white" />
+        <div className="h-2 w-2 rounded-full bg-white/30" />
       </div>
 
-      <h1 className="text-figma-h2 text-[var(--color-primary)] text-center mb-2">
-        What is your<br />weight?
+      <h1 className="mb-2 text-center text-[24px] font-semibold leading-[28px] tracking-tight">
+        What is your
+        <br />weight?
       </h1>
 
-      {/* Unit Toggle */}
-      <div className="flex gap-2 justify-center mb-8">
+      <div className="mb-8 flex justify-center gap-2">
         <button
           onClick={() => setUnit('kg')}
-          className={`px-6 py-2 rounded-full text-sm font-medium ${
-            unit === 'kg' ? 'bg-[var(--color-primary)] text-white' : 'bg-white text-gray-600'
+          className={`rounded-full px-6 py-2 text-sm font-medium transition ${
+            unit === 'kg' ? 'bg-white text-[#251B3D]' : 'bg-white/10 text-white/70'
           }`}
         >
           KG
         </button>
         <button
           onClick={() => setUnit('lbs')}
-          className={`px-6 py-2 rounded-full text-sm font-medium ${
-            unit === 'lbs' ? 'bg-[var(--color-primary)] text-white' : 'bg-white text-gray-600'
+          className={`rounded-full px-6 py-2 text-sm font-medium transition ${
+            unit === 'lbs' ? 'bg-white text-[#251B3D]' : 'bg-white/10 text-white/70'
           }`}
         >
           LBS
         </button>
       </div>
 
-      {/* Circular Weight Picker */}
-      <div className="relative w-80 h-80 mx-auto mb-8 bg-yellow-200 rounded-3xl flex items-center justify-center">
+      <div className="relative mx-auto mb-10 flex h-80 w-80 items-center justify-center rounded-[36px] bg-[rgba(255,255,255,0.06)]">
         <div className="text-center">
-          <div className="text-6xl font-bold text-[var(--color-primary)] mb-2">
-            {weight}
-          </div>
-          <div className="text-xl text-[var(--color-primary)] opacity-60">
-            {unit}
-          </div>
+          <div className="mb-2 text-6xl font-bold">{weight}</div>
+          <div className="text-xl uppercase text-white/60">{unit}</div>
         </div>
-        
-        {/* Scale markers */}
-        <div className="absolute inset-0 flex items-center justify-around px-8">
+        <div className="pointer-events-none absolute inset-0">
           {[40, 60, 80, 100, 120, 140, 160, 180].map((mark, i) => (
             <div
               key={mark}
-              className="absolute text-xs text-[var(--color-primary)] opacity-40"
+              className="absolute text-xs font-medium text-white/40"
               style={{
-                transform: `rotate(${i * 45}deg) translateY(-140px)`,
+                transform: `translate(-50%, -50%) rotate(${i * 45}deg) translateY(-140px)`,
+                left: '50%',
+                top: '50%',
               }}
             >
               {mark}
@@ -66,24 +61,22 @@ const Step1Weight: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between max-w-sm mx-auto">
+      <div className="mx-auto flex w-full max-w-sm items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="w-12 h-12 rounded-full bg-white flex items-center justify-center"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10"
         >
-          <ChevronLeft className="w-6 h-6 text-[var(--color-primary)]" />
+          <ChevronLeft className="h-6 w-6 text-white" />
         </button>
-        
         <button
           onClick={() => navigate('/onboarding-step2')}
-          className="flex-1 ml-4 bg-[var(--color-primary)] text-white rounded-full py-4 px-8 flex items-center justify-between"
+          className="ml-4 flex flex-1 items-center justify-between rounded-full bg-white py-4 px-8 text-[#251B3D]"
         >
           <span className="text-figma-body font-semibold">Next</span>
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="h-6 w-6" />
         </button>
       </div>
-    </div>
+    </ScreenLayout>
   );
 };
 

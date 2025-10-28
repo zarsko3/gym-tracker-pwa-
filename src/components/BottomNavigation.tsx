@@ -19,29 +19,25 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab, classNam
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <div className="flex items-center justify-between rounded-[36px] bg-[rgba(42,32,63,0.85)] px-6 py-5 shadow-[0_24px_60px_rgba(6,2,25,0.45)] backdrop-blur">
+      <div className="flex items-center justify-between rounded-[36px] bg-[rgba(32,24,52,0.85)] px-7 py-5 shadow-[0_22px_52px_rgba(6,2,25,0.45)] backdrop-blur-lg w-full max-w-[390px]">
         {tabs.map(({ path, icon: Icon, label }) => {
-          const isActive = location.pathname === path || 
-            (path === '/dashboard' && location.pathname === '/');
+          const isActive = 
+            (activeTab === 'home' && path === '/dashboard') ||
+            (path !== '/dashboard' && location.pathname === path);
           
           return (
             <Link
               key={path}
               to={path}
-              className={`mx-2 flex flex-col items-center gap-1 text-[11px] font-medium uppercase tracking-[0.18em] transition-colors ${
-                isActive ? 'text-white' : 'text-white/35'
-              }`}
+              className="flex flex-col items-center"
             >
-              <div className={`grid h-12 w-12 place-items-center rounded-full border ${
+              <div className={`grid h-[52px] w-[52px] place-items-center rounded-full border ${
                 isActive
-                  ? 'border-white bg-white text-[#251B3D] shadow-[0_10px_28px_rgba(255,255,255,0.35)]'
-                  : 'border-white/10 bg-[rgba(255,255,255,0.05)] text-white'
+                  ? 'border-white bg-white text-[#251B3D] shadow-[0_12px_30px_rgba(255,255,255,0.38)]'
+                  : 'border-white/8 bg-white/5 text-white/65'
               }`}>
-                <Icon className={`h-5 w-5 ${isActive ? '' : 'text-white/65'}`} strokeWidth={1.6} />
+                <Icon className={`h-[20px] w-[20px]`} strokeWidth={1.6} />
               </div>
-              <span className="hidden text-[10px] tracking-[0.24em]">
-                {label}
-              </span>
             </Link>
           );
         })}

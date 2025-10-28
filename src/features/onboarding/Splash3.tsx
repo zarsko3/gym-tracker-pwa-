@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dumbbell } from 'lucide-react';
+import ScreenLayout from '../../components/ScreenLayout';
 
 const Splash3: React.FC = () => {
   const navigate = useNavigate();
@@ -13,14 +14,14 @@ const Splash3: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className="h-screen w-full bg-[var(--color-primary)] flex flex-col items-center justify-center px-6">
-      <div className="w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center mb-8">
-        <Dumbbell className="w-10 h-10 text-white" />
+    <ScreenLayout contentClassName="flex h-full flex-col items-center justify-center px-6">
+      <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-full border-2 border-white/20">
+        <Dumbbell className="h-10 w-10 text-white" />
       </div>
-      <h1 className="text-figma-h1 text-white text-center">
+      <h1 className="text-center text-figma-h1 text-white">
         Start your<br />Fitness Journey
       </h1>
-    </div>
+    </ScreenLayout>
   );
 };
 

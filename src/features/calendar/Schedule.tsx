@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { db } from '../../services/firebase';
 import { Plus, CheckCircle } from 'lucide-react';
 import BottomNavigation from '../../components/BottomNavigation';
+import ScreenLayout from '../../components/ScreenLayout';
 
 interface WorkoutData {
   date: string;
@@ -46,9 +47,9 @@ const Schedule: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
-        <div className="spinner"></div>
-      </div>
+      <ScreenLayout contentClassName="flex h-full items-center justify-center">
+        <div className="spinner" />
+      </ScreenLayout>
     );
   }
 
@@ -74,48 +75,42 @@ const Schedule: React.FC = () => {
     .slice(0, 10);
 
   return (
-    <div className="min-h-screen bg-[var(--color-primary)] pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-figma-h1 text-white mb-1">Schedule</h1>
-        <p className="text-figma-caption text-[var(--color-text-secondary)]">
-          {dateStr}
-        </p>
+    <ScreenLayout contentClassName="flex h-full flex-col px-6 pt-[86px] pb-10">
+      <div className="mb-6">
+        <h1 className="text-figma-h1">Schedule</h1>
+        <p className="text-figma-caption text-white/60">{dateStr}</p>
       </div>
 
-      {/* Workout List */}
-      <div className="px-6 space-y-4">
+      <div className="space-y-4">
         {workoutList.map(([date, workout]) => {
           const workoutDate = new Date(date + 'T00:00:00');
-          const isCompleted = workout.exercises.every(exercise => 
-            exercise.sets.every(set => set.completed)
+          const isCompleted = workout.exercises.every((exercise) =>
+            exercise.sets.every((set) => set.completed)
           );
-          
+
           return (
             <div key={date} className="glass-card p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getWorkoutTypeColor(workout.workoutType)}`}>
-                    <span className="text-white font-bold text-lg">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-full ${getWorkoutTypeColor(workout.workoutType)}`}>
+                    <span className="text-lg font-bold text-[#251B3D]">
                       {workoutDate.getDate()}
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-figma-h3 text-white">{workout.workoutType}</h3>
-                    <p className="text-figma-caption text-[var(--color-text-secondary)]">
-                      {workoutDate.toLocaleDateString('en-US', { 
+                    <h3 className="text-figma-h3 text-white capitalize">{workout.workoutType}</h3>
+                    <p className="text-figma-caption text-white/60">
+                      {workoutDate.toLocaleDateString('en-US', {
                         weekday: 'long',
                         month: 'short',
-                        day: 'numeric'
+                        day: 'numeric',
                       })}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {isCompleted && (
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                  )}
-                  <span className="text-figma-caption text-[var(--color-text-muted)]">
+                <div className="flex items-center gap-2 text-white/60">
+                  {isCompleted && <CheckCircle className="h-6 w-6 text-green-400" />}
+                  <span className="text-figma-caption">
                     {workout.exercises.length} exercises
                   </span>
                 </div>
@@ -125,14 +120,12 @@ const Schedule: React.FC = () => {
         })}
       </div>
 
-      {/* Floating Action Button */}
-      <button className="fixed bottom-24 right-6 w-14 h-14 bg-[var(--color-pink)] rounded-full flex items-center justify-center shadow-lg">
-        <Plus className="w-6 h-6 text-white" />
+      <button className="mt-8 flex h-14 w-14 items-center justify-center self-end rounded-full bg-[var(--color-pink)] shadow-lg">
+        <Plus className="h-6 w-6 text-white" />
       </button>
 
-      {/* Bottom Navigation */}
-      <BottomNavigation activeTab="schedule" />
-    </div>
+      <BottomNavigation activeTab="schedule" className="mt-auto pt-10" />
+    </ScreenLayout>
   );
 };
 

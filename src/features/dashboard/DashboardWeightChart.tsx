@@ -10,6 +10,8 @@ interface DashboardWeightChartProps {
   data: ChartPoint[];
   activeIndex: number;
   activeValueLabel: string;
+  title: string;
+  description: string;
 }
 
 interface Point {
@@ -17,11 +19,11 @@ interface Point {
   y: number;
 }
 
-const VIEWBOX_WIDTH = 320;
-const VIEWBOX_HEIGHT = 180;
-const PADDING_X = 36;
-const PADDING_TOP = 30;
-const PADDING_BOTTOM = 56;
+const VIEWBOX_WIDTH = 322;
+const VIEWBOX_HEIGHT = 196;
+const PADDING_X = 34;
+const PADDING_TOP = 28;
+const PADDING_BOTTOM = 60;
 
 const createSmoothPath = (points: Point[]) => {
   if (!points.length) return '';
@@ -49,6 +51,8 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
   data,
   activeIndex,
   activeValueLabel,
+  title,
+  description,
 }) => {
   const values = data.map((point) => point.value);
   const maxValue = Math.max(...values, 0);
@@ -76,9 +80,9 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
   const areaPath = useMemo(() => {
     if (!points.length || !linePath) return '';
 
-    const baselineY = VIEWBOX_HEIGHT - PADDING_BOTTOM + 18;
-    const leftIntersectionX = PADDING_X - 42;
-    const rightIntersectionX = VIEWBOX_WIDTH - PADDING_X + 42;
+    const baselineY = VIEWBOX_HEIGHT - PADDING_BOTTOM + 20;
+    const leftIntersectionX = PADDING_X - 20;
+    const rightIntersectionX = VIEWBOX_WIDTH - PADDING_X + 20;
 
     return (
       linePath +
@@ -88,46 +92,36 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
   }, [points, linePath]);
 
   const activePoint = points[activeIndex];
-  const paddedActivePoint = activePoint
-    ? {
-        x: activePoint.x,
-        y: activePoint.y,
-      }
-    : undefined;
 
   return (
-    <div className="relative rounded-[32px] bg-[rgba(29,22,48,0.85)] border border-white/12 px-6 pt-6 pb-12 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-white/8 via-transparent to-transparent pointer-events-none" />
+    <div className="relative rounded-[32px] border border-white/14 bg-[rgba(27,21,48,0.85)] px-6 pt-6 pb-8 shadow-[0_22px_60px_rgba(6,2,25,0.45)] backdrop-blur">
+      <div className="relative flex items-center justify-between mb-4">
+        <div>
+          <p className="text-[15px] font-semibold text-white">{title}</p>
+          <p className="mt-1 text-[12px] font-medium text-white/60">{description}</p>
+        </div>
+      </div>
 
-      <div className="relative h-[212px]">
+      <div className="relative h-[180px]">
         <svg
           viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-          className="w-full h-full"
+          className="h-full w-full"
           preserveAspectRatio="xMidYMin meet"
         >
           <defs>
             <linearGradient id="dashboardChartFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
+              <stop offset="0%" stopColor="rgba(255,255,255,0.16)" />
               <stop offset="100%" stopColor="rgba(255,255,255,0)" />
             </linearGradient>
             <linearGradient id="dashboardChartStroke" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#9DE4FF" />
-              <stop offset="50%" stopColor="#A7B9FF" />
+              <stop offset="54%" stopColor="#B6C4FF" />
               <stop offset="100%" stopColor="#FFFFFF" />
             </linearGradient>
           </defs>
 
-          <rect
-            x={PADDING_X}
-            y={PADDING_TOP}
-            width={VIEWBOX_WIDTH - PADDING_X * 2}
-            height={VIEWBOX_HEIGHT - PADDING_TOP - PADDING_BOTTOM}
-            fill="url(#dashboardChartFill)"
-            opacity={0.12}
-          />
-
           {areaPath && (
-            <path d={areaPath} fill="url(#dashboardChartFill)" opacity={0.45} />
+            <path d={areaPath} fill="url(#dashboardChartFill)" opacity={0.5} />
           )}
 
           {linePath && (
@@ -135,59 +129,55 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
               d={linePath}
               fill="none"
               stroke="url(#dashboardChartStroke)"
-              strokeWidth={3.6}
+              strokeWidth={3}
               strokeLinecap="round"
             />
           )}
 
-          {paddedActivePoint && (
+          {activePoint && (
             <g>
               <line
-                x1={paddedActivePoint.x}
-                x2={paddedActivePoint.x}
-                y1={paddedActivePoint.y}
+                x1={activePoint.x}
+                x2={activePoint.x}
+                y1={activePoint.y}
                 y2={VIEWBOX_HEIGHT - PADDING_BOTTOM + 18}
-                stroke="rgba(255,255,255,0.35)"
-                strokeWidth={1.8}
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth={1.5}
+                strokeDasharray="4 5"
               />
               <circle
-                cx={paddedActivePoint.x}
-                cy={paddedActivePoint.y}
-                r={7}
+                cx={activePoint.x}
+                cy={activePoint.y}
+                r={6}
                 fill="#FAF0A1"
                 stroke="#1C132F"
-                strokeWidth={3.4}
+                strokeWidth={2.5}
               />
             </g>
           )}
         </svg>
 
-        {paddedActivePoint && (
+        {activePoint && (
           <div
-            className="absolute flex flex-col items-center pointer-events-none"
+            className="pointer-events-none absolute flex flex-col items-center"
             style={{
-              left: `${(paddedActivePoint.x / VIEWBOX_WIDTH) * 100}%`,
-              top: `${(paddedActivePoint.y / VIEWBOX_HEIGHT) * 100}%`,
-              transform: 'translate(-50%, -68%)',
+              left: `${(activePoint.x / VIEWBOX_WIDTH) * 100}%`,
+              top: `${(activePoint.y / VIEWBOX_HEIGHT) * 100}%`,
+              transform: 'translate(-50%, -75%)',
             }}
           >
-            <div className="relative px-5 py-1.5 rounded-full bg-[#FAF0A1] text-[#1C132F] text-[12px] font-semibold tracking-[0.2em] shadow-[0_14px_36px_rgba(250,240,161,0.32)] uppercase">
+            <div className="relative rounded-full bg-[#FAF0A1] px-5 py-1.5 text-[12px] font-semibold text-[#1C132F] shadow-[0_16px_40px_rgba(250,240,161,0.38)]">
               {activeValueLabel}
-              <span className="absolute -bottom-[5px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[#FAF0A1]" />
+              <span className="absolute -bottom-[6px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[#FAF0A1]" />
             </div>
-            <div className="h-5 w-px bg-[#FAF0A1]/70" />
+            <div className="h-6 w-px bg-[#FAF0A1]/70" />
           </div>
         )}
       </div>
 
-      <div className="mt-6 grid grid-cols-7 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/35">
+      <div className="mt-4 grid grid-cols-7 text-[11px] font-medium text-white/50">
         {data.map((point, index) => (
-          <span
-            key={`${point.axisLabel}-${index}`}
-            className={
-              index === activeIndex ? 'text-white' : undefined
-            }
-          >
+          <span key={`${point.axisLabel}-${index}`} className={`text-center ${index === activeIndex ? 'text-white' : undefined}`}>
             {point.axisLabel}
           </span>
         ))}

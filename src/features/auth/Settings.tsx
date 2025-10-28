@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { User, Bell, Shield, LogOut, Edit3, Settings as SettingsIcon, HelpCircle, Type } from 'lucide-react';
+import { User, Bell, Shield, LogOut, Edit3, HelpCircle, Type } from 'lucide-react';
 import BottomNavigation from '../../components/BottomNavigation';
+import ScreenLayout from '../../components/ScreenLayout';
 
 const Settings: React.FC = () => {
   const { user, logout } = useAuth();
@@ -26,45 +27,42 @@ const Settings: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-primary)] pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-figma-h1 text-white mb-1">Settings</h1>
+    <ScreenLayout contentClassName="flex h-full flex-col px-6 pt-[86px] pb-10">
+      <div className="mb-8">
+        <h1 className="text-figma-h1">Settings</h1>
       </div>
 
-      {/* Profile Section */}
-      <div className="px-6 mb-8">
+      <div className="mb-8">
         <div className="card-figma">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[var(--color-pink)] flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-pink)]">
+              <User className="h-8 w-8 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-figma-h3 text-white mb-1">{user?.displayName || 'User'}</h3>
-              <div className="flex gap-4 text-figma-caption text-[var(--color-text-secondary)]">
+              <h3 className="mb-1 text-figma-h3 text-white">{user?.displayName || 'User'}</h3>
+              <div className="flex gap-4 text-figma-caption text-white/60">
                 <span>175 cm</span>
                 <span>70 kg</span>
               </div>
             </div>
-            <button className="w-10 h-10 rounded-full bg-[var(--color-card-light)] flex items-center justify-center">
-              <Edit3 className="w-5 h-5 text-white" />
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
+              <Edit3 className="h-5 w-5 text-white" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* App Settings Section */}
-      <div className="px-6 mb-6">
-        <h2 className="text-figma-h3 text-white mb-4">App Settings</h2>
+      <div className="mb-6">
+        <h2 className="mb-4 text-figma-h3">App Settings</h2>
         <div className="space-y-3">
           {appSettingsItems.map(({ icon: Icon, label, action }, index) => (
             <button
               key={index}
               onClick={action}
-              className="w-full glass-card p-4 flex items-center gap-4 text-left hover:bg-[var(--color-card-light)]/50 transition-colors"
+              className="glass-card flex w-full items-center gap-4 p-4 text-left transition hover:bg-white/10"
             >
-              <div className="w-10 h-10 rounded-full bg-[var(--color-card-light)] flex items-center justify-center">
-                <Icon className="w-5 h-5 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
+                <Icon className="h-5 w-5 text-white" />
               </div>
               <span className="text-figma-body text-white">{label}</span>
             </button>
@@ -72,18 +70,17 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
-      {/* Support Section */}
-      <div className="px-6 mb-6">
-        <h2 className="text-figma-h3 text-white mb-4">Support</h2>
+      <div className="mb-6">
+        <h2 className="mb-4 text-figma-h3">Support</h2>
         <div className="space-y-3">
           {supportItems.map(({ icon: Icon, label, action }, index) => (
             <button
               key={index}
               onClick={action}
-              className="w-full glass-card p-4 flex items-center gap-4 text-left hover:bg-[var(--color-card-light)]/50 transition-colors"
+              className="glass-card flex w-full items-center gap-4 p-4 text-left transition hover:bg-white/10"
             >
-              <div className="w-10 h-10 rounded-full bg-[var(--color-card-light)] flex items-center justify-center">
-                <Icon className="w-5 h-5 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
+                <Icon className="h-5 w-5 text-white" />
               </div>
               <span className="text-figma-body text-white">{label}</span>
             </button>
@@ -91,22 +88,20 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
-      {/* Logout Button */}
-      <div className="px-6">
+      <div>
         <button
           onClick={handleLogout}
-          className="w-full glass-card p-4 flex items-center gap-4 text-left border border-red-500/20 hover:bg-red-500/10 transition-colors"
+          className="glass-card flex w-full items-center gap-4 border border-red-500/20 p-4 text-left transition hover:bg-red-500/10"
         >
-          <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
-            <LogOut className="w-5 h-5 text-red-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/20">
+            <LogOut className="h-5 w-5 text-red-400" />
           </div>
           <span className="text-figma-body text-red-400">Logout</span>
         </button>
       </div>
 
-      {/* Bottom Navigation */}
-      <BottomNavigation activeTab="settings" />
-    </div>
+      <BottomNavigation activeTab="settings" className="mt-auto pt-10" />
+    </ScreenLayout>
   );
 };
 

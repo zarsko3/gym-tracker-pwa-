@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../services/firebase';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import ScreenLayout from '../../components/ScreenLayout';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -48,77 +49,74 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-primary)] px-6 py-12 relative overflow-hidden">
-      {/* Background gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-[#1a1526] opacity-80" />
-      
-      {/* Main content container */}
-      <div className="relative z-10 auth-entrance">
-        {/* Back button */}
+    <ScreenLayout contentClassName="auth-entrance flex h-full flex-col px-6 py-8">
+      <div className="flex items-center mb-4">
         <button
           onClick={() => navigate(-1)}
-          className="mb-8 w-10 h-10 rounded-full bg-[var(--color-card-dark)] flex items-center justify-center hover:bg-[var(--color-card-light)] transition-all duration-200"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/15 transition"
         >
-          <ChevronLeft className="w-6 h-6 text-white" />
+          <ArrowLeft className="h-5 w-5 text-white" />
         </button>
+      </div>
 
-        {/* Title */}
-        <h1 className="text-figma-h1 text-white mb-2">
-          Welcome back! Glad<br />to see you, Again!
-        </h1>
+      <h1 className="mb-2 text-figma-h1 leading-tight">
+        Welcome back!
+      </h1>
+      <p className="text-figma-body text-white/70 mb-8">
+        Hello! Register to get started
+      </p>
 
-        {/* Form */}
-        <form onSubmit={handleLogin} className="mt-8 space-y-4">
-          <div className="space-y-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-figma w-full"
-              required
-            />
-            
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-figma w-full"
-              required
-            />
+      <form onSubmit={handleLogin} className="space-y-4 flex-1">
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input-figma w-full"
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input-figma w-full"
+            required
+          />
+        </div>
+
+        <div className="text-right">
+          <Link to="/forgot-password" className="text-figma-caption text-white/60 transition hover:text-white">
+            Forgot Password?
+          </Link>
+        </div>
+
+        {error && (
+          <div className="rounded-lg border border-red-500/30 bg-red-900/20 p-3">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
+        )}
 
-          <div className="text-right">
-            <Link to="/forgot-password" className="text-figma-caption text-[var(--color-text-secondary)] hover:text-white transition-colors duration-200">
-              Forgot Password?
-            </Link>
-          </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-figma-primary mt-6 w-full transform transition-all duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none"
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
 
-          {error && (
-            <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
-              <p className="text-sm text-red-400">{error}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-figma-primary w-full mt-6 transform transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        {/* Footer link */}
-        <p className="text-center text-figma-body text-[var(--color-text-secondary)] mt-6">
+      <div className="mt-auto">
+        <p className="text-center text-figma-body text-white/70">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-white font-semibold hover:text-[var(--color-text-primary)] transition-colors duration-200">
+          <Link to="/signup" className="font-semibold text-white transition hover:text-[#FAF0A1]">
             Register Now
           </Link>
         </p>
       </div>
-    </div>
+    </ScreenLayout>
   );
 };
 
