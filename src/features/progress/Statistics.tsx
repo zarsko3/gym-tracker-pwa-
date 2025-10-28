@@ -14,7 +14,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { TrendingUp, Zap } from 'lucide-react';
+import { TrendingUp, Zap, BarChart3 } from 'lucide-react';
 import BottomNavigation from '../../components/BottomNavigation';
 
 ChartJS.register(
@@ -230,7 +230,7 @@ const Statistics: React.FC = () => {
             </div>
             <div className="flex items-center justify-between mt-4 text-sm">
               <div className="text-[var(--color-text-secondary)]">
-                Avg: {Math.round(getCaloriesData().datasets[0].data.reduce((a, b) => a + b, 0) / 7)} cal/day
+                Avg: {Math.round(getCaloriesData().datasets[0].data.reduce((a: number, b: number) => a + b, 0) / 7)} cal/day
               </div>
               <div className="text-[var(--color-pink)] font-medium">
                 +12% vs last week
