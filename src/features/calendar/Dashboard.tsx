@@ -1,57 +1,12 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import React, { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { db } from '../../services/firebase';
 import BottomNavigation from '../../components/BottomNavigation';
 import DashboardWeightChart from '../dashboard/DashboardWeightChart';
 
-interface WorkoutData {
-  date: string;
-  workoutType: string;
-  templateId: string;
-  exercises: Array<{
-    name: string;
-    sets: Array<{
-      reps: number;
-      weight: number;
-    }>;
-  }>;
-}
-
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const [workouts, setWorkouts] = useState<Record<string, WorkoutData>>({});
-  const [loading, setLoading] = useState(true);
   const initialDisplayDay = 11;
   const [activeDayValue, setActiveDayValue] = useState<number>(initialDisplayDay);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const q = query(
-      collection(db, 'users', user.uid, 'workouts'),
-      orderBy('date', 'desc')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const workoutData: Record<string, WorkoutData> = {};
-      snapshot.docs.forEach(doc => {
-        workoutData[doc.id] = doc.data() as WorkoutData;
-      });
-      setWorkouts(workoutData);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
 
   const today = new Date();
   const greeting = `Hi!,\n${user?.displayName || 'Zarsko'}`;
