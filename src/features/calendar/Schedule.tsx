@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../services/firebase';
-import { Plus, CheckCircle } from 'lucide-react';
+import { Plus, CheckCircle, Calendar, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '../../components/BottomNavigation';
 import ScreenLayout from '../../components/ScreenLayout';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface WorkoutData {
   date: string;
@@ -22,6 +24,7 @@ interface WorkoutData {
 
 const Schedule: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [workouts, setWorkouts] = useState<Record<string, WorkoutData>>({});
   const [loading, setLoading] = useState(true);
 
@@ -48,7 +51,7 @@ const Schedule: React.FC = () => {
   if (loading) {
     return (
       <ScreenLayout contentClassName="flex h-full items-center justify-center">
-        <div className="spinner" />
+        <LoadingSpinner />
       </ScreenLayout>
     );
   }
@@ -74,57 +77,104 @@ const Schedule: React.FC = () => {
     .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
     .slice(0, 10);
 
+  const handleWorkoutClick = (date: string) => {
+    navigate(`/workout/${date}`);
+  };
+
+  const handleAddWorkout = () => {
+    // Navigate to templates or workout selection
+    navigate('/templates');
+  };
+
   return (
-    <ScreenLayout contentClassName="flex h-full flex-col px-6 pt-[86px] pb-10">
-      <div className="mb-6">
-        <h1 className="text-figma-h1">Schedule</h1>
-        <p className="text-figma-caption text-white/60">{dateStr}</p>
+    <ScreenLayout contentClassName="flex h-full flex-col">
+      <div className="flex-shrink-0 px-6 pt-6 pb-4">
+        <h1 className="text-[28px] font-bold text-white leading-tight tracking-[-0.5px]">
+          Schedule
+        </h1>
+        <p className="text-white/60 text-[15px] mt-1">{dateStr}</p>
       </div>
 
-      <div className="space-y-4">
-        {workoutList.map(([date, workout]) => {
-          const workoutDate = new Date(date + 'T00:00:00');
-          const isCompleted = workout.exercises.every((exercise) =>
-            exercise.sets.every((set) => set.completed)
-          );
-
-          return (
-            <div key={date} className="glass-card p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-full ${getWorkoutTypeColor(workout.workoutType)}`}>
-                    <span className="text-lg font-bold text-[#251B3D]">
-                      {workoutDate.getDate()}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-figma-h3 text-white capitalize">{workout.workoutType}</h3>
-                    <p className="text-figma-caption text-white/60">
-                      {workoutDate.toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-white/60">
-                  {isCompleted && <CheckCircle className="h-6 w-6 text-green-400" />}
-                  <span className="text-figma-caption">
-                    {workout.exercises.length} exercises
-                  </span>
-                </div>
-              </div>
+      <div className="flex-1 overflow-y-auto px-6 pb-6">
+        {workoutList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-8 -mt-20">
+            <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <Calendar className="w-10 h-10 text-white/40" />
             </div>
-          );
-        })}
+            <h3 className="text-white text-lg font-semibold mb-2">No Workouts Scheduled</h3>
+            <p className="text-white/60 text-sm mb-6 max-w-xs">
+              Start by adding your first workout to begin tracking your fitness journey.
+            </p>
+            <button 
+              onClick={handleAddWorkout}
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-[var(--color-pink)] to-[var(--color-yellow)] text-white font-medium shadow-lg transition-transform hover:scale-105"
+            >
+              Add Workout
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {workoutList.map(([date, workout]) => {
+              const workoutDate = new Date(date + 'T00:00:00');
+              const isCompleted = workout.exercises.every((exercise) =>
+                exercise.sets.every((set) => set.completed)
+              );
+
+              return (
+                <div 
+                  key={date} 
+                  onClick={() => handleWorkoutClick(date)}
+                  className="rounded-2xl bg-white/10 ring-1 ring-white/10 p-4 cursor-pointer transition-all hover:bg-white/[0.12] hover:ring-white/20 active:scale-[0.98]"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${getWorkoutTypeColor(workout.workoutType)} shadow-md`}>
+                        <span className="text-xl font-bold text-[#251B3D]">
+                          {workoutDate.getDate()}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-white font-semibold text-base capitalize">
+                            {workout.workoutType}
+                          </h3>
+                          {isCompleted && (
+                            <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-white/60 text-sm">
+                          {workoutDate.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <p className="text-white/50 text-xs mt-1">
+                          {workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-white/40 flex-shrink-0" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      <button className="mt-8 flex h-14 w-14 items-center justify-center self-end rounded-full bg-[var(--color-pink)] shadow-lg">
-        <Plus className="h-6 w-6 text-white" />
-      </button>
+      {/* Floating Add Button */}
+      {workoutList.length > 0 && (
+        <button 
+          onClick={handleAddWorkout}
+          className="absolute bottom-24 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-pink)] to-[var(--color-yellow)] shadow-[0_8px_24px_rgba(255,107,157,0.4)] transition-all hover:scale-110 active:scale-95 z-10"
+          aria-label="Add workout"
+        >
+          <Plus className="h-6 w-6 text-white" />
+        </button>
+      )}
 
-      <BottomNavigation activeTab="schedule" className="mt-auto pt-10" />
+      <BottomNavigation activeTab="schedule" />
     </ScreenLayout>
   );
 };

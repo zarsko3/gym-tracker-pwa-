@@ -26,6 +26,8 @@ import Schedule from './features/calendar/Schedule';
 import Statistics from './features/progress/Statistics';
 import WorkoutLogger from './features/workout/WorkoutLogger';
 import WorkoutScreen from './features/workout/WorkoutScreen';
+import NewWorkoutScreen from './features/workout/NewWorkoutScreen';
+import TestWorkoutScreen from './features/workout/TestWorkoutScreen';
 import WorkoutSuccess from './features/workout/WorkoutSuccess';
 import Progress from './features/progress/Progress';
 import Templates from './features/templates/Templates';
@@ -86,6 +88,8 @@ function App() {
             <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/workout/:date" element={<WorkoutScreen />} />
+            <Route path="/new-workout/:workoutId" element={<NewWorkoutScreen />} />
+            <Route path="/test-workout" element={<TestWorkoutScreen />} />
             <Route path="/workout-success" element={<ProtectedRoute><WorkoutSuccess /></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
             <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />

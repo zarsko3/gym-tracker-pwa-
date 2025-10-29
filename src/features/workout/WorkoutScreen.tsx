@@ -1,72 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, Plus, Pause, Play, Minus } from 'lucide-react';
-import ScreenLayout from '../../components/ScreenLayout';
+import { ChevronLeft, Plus, Minus, Play, Pause } from 'lucide-react';
 
-// Enhanced polished design styles
+// Custom styles for slider and other elements
 const figmaStyles = `
-  .slider {
+  input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
-    height: 6px;
-    background: linear-gradient(90deg, #e5e5e5 0%, #f0f0f0 100%);
+    height: var(--track-height);
+    background: rgba(255, 255, 255, 0.1);
     outline: none;
-    border-radius: 3px;
+    border-radius: 9999px;
     position: relative;
     cursor: pointer;
   }
   
-  .slider::-webkit-slider-track {
+  input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    height: 6px;
-    background: linear-gradient(90deg, #e5e5e5 0%, #f0f0f0 100%);
-    border-radius: 3px;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-  }
-  
-  .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 24px;
-    height: 24px;
+    width: var(--thumb-size);
+    height: var(--thumb-size);
     background: linear-gradient(135deg, #ff6b9d 0%, #ffd966 100%);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255,107,157,0.4), 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 8px rgba(255,107,157,0.4), 0 1px 3px rgba(0,0,0,0.1);
     position: relative;
     z-index: 2;
     border: 2px solid white;
     transition: all 0.2s ease;
+    margin-top: -7.5px;
   }
   
-  .slider::-webkit-slider-thumb:hover {
+  input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 16px rgba(255,107,157,0.5), 0 2px 6px rgba(0,0,0,0.15);
   }
   
-  .slider::-moz-range-track {
-    height: 6px;
-    background: linear-gradient(90deg, #e5e5e5 0%, #f0f0f0 100%);
-    border-radius: 3px;
+  input[type="range"]::-moz-range-track {
+    height: var(--track-height);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
     border: none;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
   }
   
-  .slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
+  input[type="range"]::-moz-range-thumb {
+    width: var(--thumb-size);
+    height: var(--thumb-size);
     background: linear-gradient(135deg, #ff6b9d 0%, #ffd966 100%);
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid white;
-    box-shadow: 0 4px 12px rgba(255,107,157,0.4), 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 8px rgba(255,107,157,0.4), 0 1px 3px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
   }
   
-  .slider::-moz-range-thumb:hover {
+  input[type="range"]::-moz-range-thumb:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 16px rgba(255,107,157,0.5), 0 2px 6px rgba(0,0,0,0.15);
+  }
+  
+  input[type="range"]:focus {
+    outline: none;
+  }
+  
+  input[type="range"]:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 2px #FFB86C, 0 4px 12px rgba(255,107,157,0.4);
+  }
+  
+  input[type="range"]:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 2px #FFB86C, 0 4px 12px rgba(255,107,157,0.4);
   }
   
   .timer-ring {
@@ -91,9 +93,40 @@ const figmaStyles = `
   .exercise-list::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #ff5a8a 0%, #ffd055 100%);
   }
+  
+  /* Custom scrollbar for main content */
+  main::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  main::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  main::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+  }
+  
+  main::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 `;
 
 type WorkoutType = 'push' | 'pull' | 'legs';
+
+interface Set {
+  id: string;
+  reps: number;
+  weight: number;
+  completed: boolean;
+}
+
+interface Exercise {
+  id: string;
+  name: string;
+  sets: Set[];
+}
 
 const WorkoutScreen: React.FC = () => {
   const { date } = useParams<{ date: string }>();
@@ -102,30 +135,50 @@ const WorkoutScreen: React.FC = () => {
 
   const workoutType = (searchParams.get('type') || 'push') as WorkoutType;
   
-  // Exercise data
-  const exercises = [
-    'Bench Press or Dumbbell Press',
-    'Overhead Shoulder Press',
-    'Incline Dumbbell Press',
-    'Lateral Raises',
-    'Triceps Pushdowns',
-  ];
-
-  const [currentExercise, setCurrentExercise] = useState('Overhead Shoulder Press');
-  const [setCount, setSetCount] = useState(1);
-  const [repsCount, setRepsCount] = useState(10);
-  const [weight, setWeight] = useState(70);
-  
+  // Timer state
   const REST_PERIOD = 90; // 90 second rest timer
   const [timer, setTimer] = useState(REST_PERIOD);
   const [isTimerActive, setIsTimerActive] = useState(true);
+  const timerRef = useRef<number | null>(null);
+  
+  // Exercise data
+  const [exercises, setExercises] = useState<Exercise[]>([
+    {
+      id: '1',
+      name: 'Bench Press or Dumbbell Press',
+      sets: [{ id: '1-1', reps: 10, weight: 70, completed: false }]
+    },
+    {
+      id: '2',
+      name: 'Overhead Shoulder Press',
+      sets: [{ id: '2-1', reps: 8, weight: 50, completed: false }]
+    },
+    {
+      id: '3',
+      name: 'Incline Dumbbell Press',
+      sets: [{ id: '3-1', reps: 12, weight: 40, completed: false }]
+    },
+    {
+      id: '4',
+      name: 'Lateral Raises',
+      sets: [{ id: '4-1', reps: 15, weight: 20, completed: false }]
+    },
+    {
+      id: '5',
+      name: 'Triceps Pushdowns',
+      sets: [{ id: '5-1', reps: 12, weight: 35, completed: false }]
+    }
+  ]);
+  
+  // Current exercise state
+  const [currentExerciseId, setCurrentExerciseId] = useState('2');
+  const currentExercise = exercises.find(ex => ex.id === currentExerciseId) || exercises[0];
 
-  // Timer logic
+  // Timer effect
   useEffect(() => {
-    let interval: number | undefined;
     if (isTimerActive) {
-      interval = window.setInterval(() => {
-        setTimer((prevTimer) => {
+      timerRef.current = window.setInterval(() => {
+        setTimer(prevTimer => {
           if (prevTimer <= 0) {
             setIsTimerActive(false); // Stop timer at 0
             return 0;
@@ -133,207 +186,297 @@ const WorkoutScreen: React.FC = () => {
           return prevTimer - 1;
         });
       }, 1000);
-    } else {
-      if (interval) clearInterval(interval);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
+    
     return () => {
-      if (interval) clearInterval(interval);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
   }, [isTimerActive]);
 
   // Helper to format timer
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/dashboard');
   };
 
-  // This is a component for the tick marks on the slider
-  const RulerTick = ({ small }: { small?: boolean }) => (
-    <div className={`flex flex-col items-center space-y-1 ${small ? 'w-4' : 'w-6'}`}>
-      {small && <div className="h-4 w-[2px] bg-gray-500 rounded-full" />}
-      {!small && <div className="h-6 w-[3px] bg-gray-700 rounded-full" />}
-    </div>
-  );
+  // Handle reps change for a set
+  const handleRepsChange = (setId: string, change: number) => {
+    setExercises(prevExercises => 
+      prevExercises.map(ex => {
+        if (ex.id === currentExerciseId) {
+          return {
+            ...ex,
+            sets: ex.sets.map(set => {
+              if (set.id === setId) {
+                return {
+                  ...set,
+                  reps: Math.max(1, set.reps + change)
+                };
+              }
+              return set;
+            })
+          };
+        }
+        return ex;
+      })
+    );
+  };
+
+  // Handle weight change for a set
+  const handleWeightChange = (setId: string, newWeight: number) => {
+    setExercises(prevExercises => 
+      prevExercises.map(ex => {
+        if (ex.id === currentExerciseId) {
+          return {
+            ...ex,
+            sets: ex.sets.map(set => {
+              if (set.id === setId) {
+                return {
+                  ...set,
+                  weight: newWeight
+                };
+              }
+              return set;
+            })
+          };
+        }
+        return ex;
+      })
+    );
+  };
+
+  // Add a new set
+  const addSet = () => {
+    setExercises(prevExercises => 
+      prevExercises.map(ex => {
+        if (ex.id === currentExerciseId) {
+          const lastSet = ex.sets[ex.sets.length - 1];
+          const newSetId = `${ex.id}-${ex.sets.length + 1}`;
+          
+          return {
+            ...ex,
+            sets: [
+              ...ex.sets,
+              { 
+                id: newSetId, 
+                reps: lastSet.reps, 
+                weight: lastSet.weight, 
+                completed: false 
+              }
+            ]
+          };
+        }
+        return ex;
+      })
+    );
+    
+    // Reset timer when adding a set
+    setTimer(REST_PERIOD);
+    setIsTimerActive(true);
+  };
+
+  // Change current exercise
+  const changeExercise = (exerciseId: string) => {
+    setCurrentExerciseId(exerciseId);
+  };
 
   return (
     <>
       <style>{figmaStyles}</style>
-      <div className="w-full min-h-screen bg-gradient-to-br from-[#2B2440] via-[#1F1934] to-[#100B1F] p-4 flex items-center justify-center">
-        <div className="w-full max-w-md h-[850px] bg-gradient-to-br from-[#2B2440] via-[#1F1934] to-[#100B1F] text-white font-sans rounded-3xl shadow-2xl overflow-hidden relative">
+      <div className="w-full min-h-screen bg-[var(--color-primary)] p-4 flex items-center justify-center">
+        <div className="w-[390px] h-[844px] relative text-white font-sans overflow-hidden flex flex-col" style={{ background: 'var(--color-primary)' }}>
           
-          {/* 1. Top Bar: Back Button and Timer */}
-          <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-10">
-        <button
-          onClick={handleBack}
-              className="w-12 h-12 rounded-2xl bg-white/5 shadow-[inset_0_2px_6px_rgba(255,255,255,.06)] ring-1 ring-white/6 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-300 group"
-        >
-              <ChevronLeft size={24} className="group-hover:scale-110 transition-transform duration-200" />
-        </button>
-
-            {/* Timer Component - Soft orb with inner glow */}
-            <div className="relative h-[92px] w-[92px] rounded-full bg-[radial-gradient(60%_60%_at_30%_25%,#FFB86C,transparent),radial-gradient(70%_70%_at_70%_80%,#FF7CA4,transparent)] shadow-[0_8px_24px_rgba(0,0,0,.35)] ring-1 ring-white/12">
-              <div className="absolute inset-2 rounded-full bg-white/5 backdrop-blur-[2px] grid place-items-center text-white/90 font-semibold text-[15px]">
-                {formatTime(timer)}
-          </div>
-        </div>
-          </header>
-
-          {/* 2. Main Content Area */}
-          <main className="w-full h-full pt-24 px-6 flex flex-col">
-
-            {/* Exercise Title */}
-            <h1 
-              className="text-2xl font-bold text-center text-white mb-2"
-              style={{
-                fontFamily: 'Montserrat Alternates',
-                lineHeight: '1.2'
-              }}
-            >
-              {currentExercise}
-            </h1>
-
-            {/* Set Info */}
-            <div className="text-center mb-8">
-              <span 
-                className="text-white/70 text-sm"
-                style={{
-                  fontFamily: 'Montserrat Alternates',
-                  fontWeight: 500
-                }}
+          {/* 1. Header with back button and timer */}
+          <header className="flex-shrink-0 grid grid-cols-12 px-6 pt-6 pb-4 items-center z-10">
+            <div className="col-span-4">
+              <button
+                onClick={handleBack}
+                className="w-[48px] h-[48px] rounded-2xl flex items-center justify-center bg-white/8 shadow-[inset_0_2px_6px_rgba(255,255,255,.06)] ring-1 ring-white/6"
+                aria-label="Go back"
               >
-                set {setCount}
-              </span>
-            </div>
-
-            {/* Reps and Weight Controls */}
-            <div className="flex items-center justify-center space-x-4 mb-8">
-              {/* Reps Control */}
-              <div className="bg-[#2B2440] rounded-2xl px-4 py-3 flex items-center space-x-3">
-                <button 
-                  onClick={() => setRepsCount(r => Math.max(0, r - 1))} 
-                  className="text-white/70 text-lg hover:text-white transition-colors"
-                >
-                  −
-                </button>
-                <span 
-                  className="text-white text-sm font-medium min-w-[60px] text-center"
-                  style={{
-                    fontFamily: 'Montserrat Alternates'
-                  }}
-                >
-                  {repsCount} reps
-                </span>
-                <button 
-                  onClick={() => setRepsCount(r => r + 1)} 
-                  className="text-white/70 text-lg hover:text-white transition-colors"
-                >
-                  +
-                </button>
-              </div>
-
-              {/* Weight Control */}
-              <div className="bg-[#F6F0B8] rounded-2xl px-6 py-4 flex items-center space-x-4">
-                <button 
-                  onClick={() => setWeight(w => Math.max(0, w - 2.5))} 
-                  className="text-black/60 text-lg hover:text-black transition-colors"
-                >
-                  −
-                </button>
-                <div className="text-center">
-                  <div 
-                    className="text-black text-3xl font-bold"
-                    style={{
-                      fontFamily: 'Montserrat Alternates'
-                    }}
-                  >
-                    {weight}
-                  </div>
-                  <div 
-                    className="text-black/60 text-xs"
-                    style={{
-                      fontFamily: 'Montserrat Alternates'
-                    }}
-                  >
-                    kg
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setWeight(w => w + 2.5)} 
-                  className="text-black/60 text-lg hover:text-black transition-colors"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Add Set Button */}
-            <div className="flex justify-center">
-              <button 
-                onClick={() => {
-                  setSetCount(s => s + 1);
-                  setTimer(REST_PERIOD); // Reset timer
-                  setIsTimerActive(true); // Start timer
-                }} 
-                className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-black hover:bg-white/90 transition-colors"
-              >
-                <Plus size={24} />
+                <ChevronLeft size={24} color="white" />
               </button>
             </div>
-          </main>
-
-          {/* 3. Bottom Sheet */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-[45%] rounded-t-3xl bg-white overflow-hidden z-20"
-            style={{
-              boxShadow: '0 -4px 20px rgba(0,0,0,0.1)'
-            }}
-          >
-            {/* Exercise List */}
-            <div className="p-6 space-y-2 max-h-full overflow-y-auto">
-              {exercises.map((exercise) => (
-                <div
-                  key={exercise}
-                  onClick={() => setCurrentExercise(exercise)}
-                  className={`py-3 px-4 rounded-xl cursor-pointer transition-all duration-200 ${
-                    exercise === currentExercise
-                      ? 'bg-pink-200 text-gray-800'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                  style={{
-                    fontFamily: 'Montserrat Alternates',
-                    fontWeight: 500
-                  }}
+            
+            {/* Timer Component */}
+            <div className="col-span-4 col-start-9 flex justify-end">
+              <div className="relative">
+                <div 
+                  className="w-[92px] h-[92px] rounded-full bg-[radial-gradient(60%_60%_at_30%_25%,#FFB86C,transparent),radial-gradient(70%_70%_at_70%_80%,#FF7CA4,transparent)] shadow-[0_8px_24px_rgba(0,0,0,.35)] ring-1 ring-white/12 flex items-center justify-center"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">{exercise}</span>
-                    {exercise === currentExercise && (
-                      <div className="w-2 h-2 bg-gray-800 rounded-full"></div>
-                    )}
+                  <div className="absolute inset-2 rounded-full bg-white/5 backdrop-blur-[2px] flex items-center justify-center">
+                    <span className="text-white/90 text-[18px] font-semibold">
+                      {formatTime(timer)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* 2. Main Content Area - Scrollable */}
+          <main className="flex-1 px-6 pb-[320px] overflow-y-auto">
+            {/* Exercise Title */}
+            <div className="text-center mb-4">
+              <h1 
+                className="text-[18px] leading-tight font-extrabold tracking-[-0.2px] text-white"
+              >
+                {currentExercise.name}
+              </h1>
+            </div>
+
+            {/* Sets Section */}
+            <div className="space-y-2.5">
+              {currentExercise.sets.map((set, index) => (
+                <div key={set.id} className="rounded-2xl bg-white/10 ring-1 ring-white/10 px-4 py-3.5">
+                  {/* Set Header */}
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-white/70 text-[13px] font-medium">
+                      Set {index + 1}
+                    </span>
+                  </div>
+                  
+                  {/* Reps and Weight Row */}
+                  <div className="flex items-center gap-3">
+                    {/* Reps Control */}
+                    <div className="h-12 px-3 rounded-xl bg-white/8 ring-1 ring-white/8 flex items-center gap-3">
+                      <button 
+                        onClick={() => handleRepsChange(set.id, -1)}
+                        className="text-white/90 text-lg w-6 h-6 flex items-center justify-center"
+                        aria-label="Decrease reps"
+                      >
+                        −
+                      </button>
+                      
+                      <div className="flex items-baseline gap-1 min-w-[48px] justify-center">
+                        <span className="text-white font-semibold text-base">{set.reps}</span>
+                        <span className="text-white/60 text-xs">reps</span>
+                      </div>
+                      
+                      <button 
+                        onClick={() => handleRepsChange(set.id, 1)}
+                        className="text-white/90 text-lg w-6 h-6 flex items-center justify-center"
+                        aria-label="Increase reps"
+                      >
+                        +
+                      </button>
+                    </div>
+                    
+                    {/* Weight Display */}
+                    <div className="flex-1 flex items-baseline justify-end gap-1.5 font-mono">
+                      <span className="text-white text-xl font-bold">{set.weight}</span>
+                      <span className="text-white/70 text-sm font-medium">kg</span>
+                    </div>
+                  </div>
+                  
+                  {/* Weight Slider */}
+                  <div className="mt-3 px-0.5">
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      step="2.5"
+                      value={set.weight}
+                      onChange={(e) => handleWeightChange(set.id, parseInt(e.target.value))}
+                      className="w-full h-5 appearance-none bg-white/10 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFB86C]"
+                      style={{
+                        // Custom properties for slider styling
+                        ['--track-height' as any]: '5px',
+                        ['--thumb-size' as any]: '20px',
+                      }}
+                      aria-label="Weight slider"
+                    />
+                    <div className="flex justify-between mt-1 text-[9px] text-white/30 font-mono">
+                      <span>0</span>
+                      <span>25</span>
+                      <span>50</span>
+                      <span>75</span>
+                      <span>100</span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
+            
+            {/* Add Set Button */}
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={addSet}
+                className="flex items-center justify-center px-4 py-2 rounded-full bg-white text-[var(--color-primary)] font-medium transition-all hover:scale-105 hover:translate-y-[-2px] shadow-[0_4px_10px_rgba(0,0,0,0.25)]"
+                aria-label="Add set"
+              >
+                <Plus size={16} className="mr-4" />
+                <span>Add Set</span>
+              </button>
+            </div>
+          </main>
+
+          {/* 3. Bottom Sheet with Exercise List */}
+          <div className="absolute bottom-0 left-0 right-0 h-[287px] rounded-t-[27px] bg-white ring-1 ring-black/5 shadow-[0_18px_44px_rgba(0,0,0,0.32)] overflow-hidden z-20 mx-auto max-w-[390px]">
+            <div className="h-full flex flex-col">
+              <div className="flex-shrink-0 px-6 pt-5 pb-3 flex justify-between items-center">
+                <h3 className="text-[#2A2E34]/60 text-[13px] font-medium">Exercise List</h3>
+                <span className="text-[#2A2E34]/60 text-[13px]">
+                  {exercises.findIndex(ex => ex.id === currentExerciseId) + 1} of {exercises.length}
+                </span>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto exercise-list px-6 pb-4">
+                <div className="space-y-2">
+                  {exercises.map(exercise => (
+                    <div
+                      key={exercise.id}
+                      onClick={() => changeExercise(exercise.id)}
+                      className={`
+                        h-[52px] flex items-center justify-between px-4 cursor-pointer transition-all
+                        ${exercise.id === currentExerciseId 
+                          ? 'rounded-2xl bg-[linear-gradient(90deg,#FF7CA4_0%,#FFB86C_100%)] text-[#1C1B2A] font-semibold shadow-[0_8px_18px_rgba(0,0,0,.18)]' 
+                          : 'rounded-xl bg-[#F4F5F7] text-[#1F2937] shadow-[inset_0_1px_0_rgba(255,255,255,.6)]'
+                        }
+                      `}
+                    >
+                      <span className="text-[14px]">{exercise.name}</span>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        exercise.id === currentExerciseId 
+                          ? 'bg-white/20' 
+                          : 'bg-white/50'
+                      }`}>
+                        <div className={`w-2.5 h-2.5 rounded-full ${
+                          exercise.id === currentExerciseId 
+                            ? 'bg-[#FFC34D]' 
+                            : 'bg-[#D1D5DB]'
+                        }`}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* 4. Overlapping Pause Button */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(45%-2rem)] z-30">
+          {/* 4. Pause Button */}
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-[251px] z-30">
             <button 
               onClick={() => setIsTimerActive(!isTimerActive)}
-              className="w-16 h-16 rounded-full flex items-center justify-center group hover:scale-105 transition-all duration-300"
-              style={{
-                background: '#F6F0B8',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-              }}
+              className="w-[72px] h-[72px] rounded-full bg-[#F4F0B0] flex items-center justify-center shadow-[0_12px_24px_rgba(0,0,0,0.25)] transition-transform hover:scale-105"
+              aria-label={isTimerActive ? "Pause workout" : "Resume workout"}
             >
               {isTimerActive ? (
-                <Pause size={24} className="text-black fill-black group-hover:scale-110 transition-transform duration-200" />
+                <div className="flex">
+                  <div className="w-[5px] h-[39px] bg-black rounded-lg mx-[5px]"></div>
+                  <div className="w-[5px] h-[39px] bg-black rounded-lg mx-[5px]"></div>
+                </div>
               ) : (
-                <Play size={24} className="text-black fill-black group-hover:scale-110 transition-transform duration-200" />
+                <Play size={24} color="black" />
               )}
             </button>
           </div>
