@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, Plus, Minus, Play, Pause, CheckCircle } from 'lucide-react';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { getExercisesForWorkout, type ExerciseData } from '../../services/templates';
 import ScreenLayout from '../../components/ScreenLayout';
+import { db } from '../../services/firebase';
+import { useAuth } from '../../context/AuthContext';
 
 // Custom styles for slider and other elements
 const figmaStyles = `
@@ -135,6 +138,7 @@ const WorkoutScreen: React.FC = () => {
   const { date } = useParams<{ date: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const workoutTypeParam = searchParams.get('type') || 'Push';
   const workoutType = (workoutTypeParam.charAt(0).toUpperCase() + workoutTypeParam.slice(1).toLowerCase()) as WorkoutType;
@@ -219,13 +223,46 @@ const WorkoutScreen: React.FC = () => {
   };
 
   // Handle finish workout
-  const handleFinishWorkout = () => {
-    // TODO: Save workout data to database
-    // For now, just navigate to success screen or dashboard
+  const handleFinishWorkout = async () => {
+    if (!user) {
+      console.error('No user logged in');
+      return;
+    }
+
     const dateStr = date || new Date().toISOString().split('T')[0];
     
-    // Navigate to workout success screen
-    navigate(`/workout-success?date=${dateStr}&type=${workoutType}`);
+    try {
+      // Prepare workout data for database
+      const workoutData = {
+        date: dateStr,
+        workoutType: workoutType.toLowerCase(),
+        templateId: 'ppl-default',
+        completed: true,
+        completedAt: serverTimestamp(),
+        exercises: exercises.map(exercise => ({
+          name: exercise.name,
+          sets: exercise.sets.map(set => ({
+            reps: set.reps,
+            weight: set.weight,
+            completed: set.completed
+          }))
+        }))
+      };
+
+      // Save to Firebase
+      await setDoc(
+        doc(db, 'users', user.uid, 'workouts', dateStr),
+        workoutData
+      );
+
+      console.log('Workout saved successfully');
+      
+      // Navigate to success screen
+      navigate(`/workout-success?date=${dateStr}&type=${workoutType}`);
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      alert('Failed to save workout. Please try again.');
+    }
   };
 
   // Handle reps change for a set

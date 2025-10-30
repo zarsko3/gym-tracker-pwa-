@@ -2,6 +2,8 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Calendar as CalendarIcon, Trash2, Plus } from 'lucide-react';
+import { collection, onSnapshot, query, doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../services/firebase';
 import BottomNavigation from '../../components/BottomNavigation';
 import DashboardWeightChart from '../dashboard/DashboardWeightChart';
 import ScreenLayout from '../../components/ScreenLayout';
@@ -44,39 +46,32 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Load workout data (in a real app, this would come from an API)
+  // Load workout data from Firebase
   useEffect(() => {
-    // Generate realistic mock workout data based on current date
-    const generateMockData = (): WorkoutData[] => {
-      const data: WorkoutData[] = [];
-      const today = new Date();
+    if (!user) {
+      setWorkoutData([]);
+      return;
+    }
+
+    const workoutsRef = collection(db, 'users', user.uid, 'workouts');
+    const q = query(workoutsRef);
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const workouts: WorkoutData[] = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          date: doc.id, // Document ID is the date string
+          type: data.workoutType as WorkoutType,
+          completed: data.completed || false,
+        };
+      });
       
-      // Generate data for 14 days (3 days before today + today + 10 days after)
-      for (let i = -3; i <= 10; i++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() + i);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        // PPL rotation for mock data
-        const dayOfWeek = date.getDay();
-        const pplRotation = ['rest', 'push', 'pull', 'legs', 'rest', 'push', 'pull'];
-        const workoutType = pplRotation[dayOfWeek] as WorkoutType;
-        
-        // Only generate completed workouts for past days and today
-        const completed = i <= 0 ? Math.random() > 0.3 : false; // 70% completion rate for past days
-        
-        data.push({
-          date: dateStr,
-          type: workoutType,
-          completed,
-        });
-      }
-      
-      return data;
-    };
-    
-    setWorkoutData(generateMockData());
-  }, []);
+      setWorkoutData(workouts);
+      console.log('Loaded workouts from Firebase:', workouts);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   // Function to update workout data (called when workout is logged)
   const updateWorkoutData = (date: string, type: WorkoutType, completed: boolean) => {
@@ -97,8 +92,16 @@ const Dashboard: React.FC = () => {
   };
 
   // Function to delete a workout
-  const deleteWorkout = (date: string) => {
-    setWorkoutData(prevData => prevData.filter(workout => workout.date !== date));
+  const deleteWorkout = async (date: string) => {
+    if (!user) return;
+    
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'workouts', date));
+      console.log('Workout deleted successfully');
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      alert('Failed to delete workout. Please try again.');
+    }
   };
 
   // Handle delete confirmation

@@ -51,80 +51,39 @@ const Statistics: React.FC = () => {
 
   // Generate mock data immediately
   useEffect(() => {
-    const generateMockWorkouts = (): Record<string, WorkoutData> => {
-      const mockWorkouts: Record<string, WorkoutData> = {};
-      const today = new Date();
-      
-      for (let i = 0; i < 10; i++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        const workoutTypes = ['Push', 'Pull', 'Legs'];
-        const workoutType = workoutTypes[i % 3];
-        
-        mockWorkouts[dateStr] = {
-          date: dateStr,
-          workoutType,
-          templateId: `template-${i}`,
-          exercises: [
-            {
-              name: 'Bench Press',
-              sets: [
-                { reps: 10, weight: 60 },
-                { reps: 8, weight: 70 },
-                { reps: 6, weight: 80 },
-              ]
-            },
-            {
-              name: 'Squat',
-              sets: [
-                { reps: 10, weight: 80 },
-                { reps: 8, weight: 90 },
-                { reps: 6, weight: 100 },
-              ]
-            }
-          ]
-        };
-      }
-      
-      return mockWorkouts;
-    };
-    
-    // Always set mock data for now
-    setWorkouts(generateMockWorkouts());
-    setLoading(false);
-    
+    // Load real data from Firebase only
     if (!user) {
+      setWorkouts({});
+      setLoading(false);
       return;
     }
 
-    // Try to fetch from Firebase but don't override mock data if it fails
     try {
-      const q = query(
-        collection(db, 'users', user.uid, 'workouts'),
-        orderBy('date', 'desc')
-      );
+    const q = query(
+      collection(db, 'users', user.uid, 'workouts'),
+      orderBy('date', 'desc')
+    );
 
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const workoutData: Record<string, WorkoutData> = {};
-        snapshot.docs.forEach(doc => {
-          workoutData[doc.id] = doc.data() as WorkoutData;
-        });
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const workoutData: Record<string, WorkoutData> = {};
+      snapshot.docs.forEach(doc => {
+        workoutData[doc.id] = doc.data() as WorkoutData;
+      });
         
-        // Only update if we have actual data
-        if (Object.keys(workoutData).length > 0) {
-          setWorkouts(workoutData);
-        }
+      setWorkouts(workoutData);
+      setLoading(false);
+        console.log('Loaded workouts for statistics:', workoutData);
       }, (error) => {
         console.error('Error fetching workouts:', error);
-        // Keep mock data on error
-      });
+        setWorkouts({});
+        setLoading(false);
+    });
 
-      return () => unsubscribe();
+    return () => unsubscribe();
     } catch (error) {
       console.error('Firebase setup error:', error);
-      // Keep mock data
+      setWorkouts({});
+      setLoading(false);
     }
   }, [user]);
 
@@ -298,7 +257,7 @@ const Statistics: React.FC = () => {
       {/* Header */}
       <div className="flex-shrink-0 px-6 pt-6 pb-4 z-10">
         <div className="flex items-center justify-between">
-          <div>
+        <div>
             <h1 className="text-[28px] font-bold text-white leading-tight tracking-[-0.5px]">
               Statistics
             </h1>
@@ -306,15 +265,15 @@ const Statistics: React.FC = () => {
           </div>
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/10">
             <BarChart3 className="h-6 w-6 text-white" />
-          </div>
+        </div>
         </div>
       </div>
 
       {/* Tab Selector */}
       <div className="flex-shrink-0 px-6 mb-4 z-10 bg-[#1B1631]">
         <div className="flex gap-2 rounded-2xl bg-white/8 p-1 ring-1 ring-white/10">
-          <button
-            onClick={() => setActiveTab('whole')}
+        <button
+          onClick={() => setActiveTab('whole')}
             className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
               activeTab === 'whole' 
                 ? 'bg-white text-[#251B3D] shadow-lg' 
@@ -322,9 +281,9 @@ const Statistics: React.FC = () => {
             }`}
           >
             All Time
-          </button>
-          <button
-            onClick={() => setActiveTab('week')}
+        </button>
+        <button
+          onClick={() => setActiveTab('week')}
             className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
               activeTab === 'week' 
                 ? 'bg-white text-[#251B3D] shadow-lg' 
@@ -332,7 +291,7 @@ const Statistics: React.FC = () => {
             }`}
           >
             This Week
-          </button>
+        </button>
         </div>
       </div>
 
@@ -385,45 +344,45 @@ const Statistics: React.FC = () => {
             {/* Calories Chart */}
             <div className="relative overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 p-5">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--color-pink)]/5 via-transparent to-transparent" />
-              <div className="relative z-10">
-                <div className="mb-4 flex items-center justify-between">
+          <div className="relative z-10">
+            <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-white font-semibold text-base">Calories Burned</h3>
                   <div className="flex items-center gap-1.5 text-xs text-white/60">
-                    <div className="h-2 w-2 rounded-full bg-[var(--color-pink)]" />
-                    Last 7 days
-                  </div>
-                </div>
-                <div className="h-36">
-                  <Bar data={getCaloriesData()} options={chartOptions} />
-                </div>
-                <div className="mt-4 flex items-center justify-between text-xs">
-                  <span className="text-white/60">
-                    Avg: {Math.round(getCaloriesData().datasets[0].data.reduce((a: number, b: number) => a + b, 0) / 7)} cal/day
-                  </span>
-                  <span className="font-semibold text-[var(--color-pink)]">+12%</span>
-                </div>
+                <div className="h-2 w-2 rounded-full bg-[var(--color-pink)]" />
+                Last 7 days
               </div>
             </div>
+                <div className="h-36">
+              <Bar data={getCaloriesData()} options={chartOptions} />
+            </div>
+                <div className="mt-4 flex items-center justify-between text-xs">
+              <span className="text-white/60">
+                Avg: {Math.round(getCaloriesData().datasets[0].data.reduce((a: number, b: number) => a + b, 0) / 7)} cal/day
+              </span>
+                  <span className="font-semibold text-[var(--color-pink)]">+12%</span>
+            </div>
+          </div>
+        </div>
 
             {/* Weight Chart */}
             <div className="relative overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 p-5">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--color-yellow)]/5 via-transparent to-transparent" />
-              <div className="relative z-10">
-                <div className="mb-4 flex items-center justify-between">
+          <div className="relative z-10">
+            <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-white font-semibold text-base">Weight Progress</h3>
                   <div className="flex items-center gap-1.5 text-xs text-white/60">
-                    <div className="h-2 w-2 rounded-full bg-[var(--color-yellow)]" />
-                    Last 7 days
-                  </div>
-                </div>
-                <div className="h-36">
-                  <Line data={getWeightData()} options={chartOptions} />
-                </div>
-                <div className="mt-4 flex items-center justify-between text-xs">
-                  <span className="text-white/60">Current: 70.2 kg</span>
-                  <span className="font-semibold text-[var(--color-yellow)]">-0.3 kg</span>
-                </div>
+                <div className="h-2 w-2 rounded-full bg-[var(--color-yellow)]" />
+                Last 7 days
               </div>
+            </div>
+                <div className="h-36">
+              <Line data={getWeightData()} options={chartOptions} />
+            </div>
+                <div className="mt-4 flex items-center justify-between text-xs">
+              <span className="text-white/60">Current: 70.2 kg</span>
+                  <span className="font-semibold text-[var(--color-yellow)]">-0.3 kg</span>
+          </div>
+        </div>
             </div>
           </div>
         )}
