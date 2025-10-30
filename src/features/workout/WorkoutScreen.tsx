@@ -495,7 +495,7 @@ const WorkoutScreen: React.FC = () => {
 
             {/* Finish Workout Button */}
             <div className="flex justify-center mt-6">
-        <button 
+        <button
           onClick={handleFinishWorkout}
                 className="flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-[#E8D5FF] to-[#D4C5F9] text-[#2B2440] font-bold text-base transition-all hover:scale-105 hover:shadow-[0_8px_24px_rgba(232,213,255,0.4)] shadow-[0_6px_16px_rgba(0,0,0,0.25)]"
                 aria-label="Finish workout"

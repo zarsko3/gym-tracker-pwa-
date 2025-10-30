@@ -143,20 +143,15 @@ const Dashboard: React.FC = () => {
       return;
     }
     
-    // For past days, toggle workout completion
-    const dateStr = day.date.toISOString().split('T')[0];
-    const workoutType = day.workoutType || getWorkoutTypeForDate(day.date);
-    const newCompleted = !day.isCompleted;
-    
-    updateWorkoutData(dateStr, workoutType, newCompleted);
+    // For past days, just show the selected date details
+    // Workouts are only added via the WorkoutScreen "Finish Workout" button
   };
 
   // Function to handle workout selection from popup
   const handleWorkoutSelect = (workoutType: 'push' | 'pull' | 'legs', date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    updateWorkoutData(dateStr, workoutType, true);
+    // Just close the popup - workout will be saved when user clicks "Finish Workout"
+    // The navigation to WorkoutScreen is handled in the popup component
     setPopupOpen(false);
-    setSelectedDate(null);
   };
 
   // Function to close popup
