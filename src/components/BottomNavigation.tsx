@@ -19,7 +19,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab, classNam
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <div className="flex items-center justify-between rounded-[32px] bg-[rgba(32,24,52,0.9)] px-6 py-4 shadow-[0_16px_40px_rgba(6,2,25,0.4)] backdrop-blur-lg w-full max-w-[390px]">
+      <div className="flex items-center justify-between rounded-[32px] bg-[rgba(32,24,52,0.9)] px-6 py-3 shadow-[0_16px_40px_rgba(6,2,25,0.4)] backdrop-blur-lg w-full">
         {tabs.map(({ path, icon: Icon, label }) => {
           const isActive = 
             (activeTab === 'home' && path === '/dashboard') ||

@@ -294,9 +294,9 @@ const Statistics: React.FC = () => {
   console.log('Render state:', { hasData, workoutCount, streak, totalVolume });
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#1B1631] text-white overflow-hidden flex flex-col">
+    <ScreenLayout>
       {/* Header */}
-      <div className="flex-shrink-0 px-6 pt-6 pb-4 z-10 bg-[#1B1631]">
+      <div className="flex-shrink-0 px-6 pt-6 pb-4 z-10">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-[28px] font-bold text-white leading-tight tracking-[-0.5px]">
@@ -429,8 +429,8 @@ const Statistics: React.FC = () => {
         )}
       </div>
 
-      <BottomNavigation activeTab="statistics" />
-    </div>
+      <BottomNavigation activeTab="statistics" className="flex-shrink-0 px-6 pb-6 pt-4" />
+    </ScreenLayout>
   );
 };
 

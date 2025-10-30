@@ -7,11 +7,13 @@ interface ScreenLayoutProps {
 
 const ScreenLayout: React.FC<ScreenLayoutProps> = ({
   children,
-  contentClassName = 'flex h-full flex-col px-6 py-8',
+  contentClassName = '',
 }) => {
   return (
-    <div className={`fixed inset-0 w-full h-full bg-[#1B1631] text-white overflow-hidden ${contentClassName}`}>
-      {children}
+    <div className="w-full min-h-screen bg-[var(--color-primary)] py-4 flex items-center justify-center">
+      <div className={`w-[390px] max-h-[844px] relative text-white font-sans overflow-hidden flex flex-col ${contentClassName}`} style={{ background: 'var(--color-primary)', height: 'min(844px, 100vh - 2rem)' }}>
+        {children}
+      </div>
     </div>
   );
 };

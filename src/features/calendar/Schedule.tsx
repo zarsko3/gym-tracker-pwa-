@@ -50,8 +50,10 @@ const Schedule: React.FC = () => {
 
   if (loading) {
     return (
-      <ScreenLayout contentClassName="flex h-full items-center justify-center">
-        <LoadingSpinner />
+      <ScreenLayout>
+        <div className="flex h-full items-center justify-center">
+          <LoadingSpinner />
+        </div>
       </ScreenLayout>
     );
   }
@@ -87,7 +89,7 @@ const Schedule: React.FC = () => {
   };
 
   return (
-    <ScreenLayout contentClassName="flex h-full flex-col">
+    <ScreenLayout>
       <div className="flex-shrink-0 px-6 pt-6 pb-4">
         <h1 className="text-[28px] font-bold text-white leading-tight tracking-[-0.5px]">
           Schedule
@@ -174,7 +176,7 @@ const Schedule: React.FC = () => {
         </button>
       )}
 
-      <BottomNavigation activeTab="schedule" />
+      <BottomNavigation activeTab="schedule" className="flex-shrink-0 px-6 pb-6 pt-4" />
     </ScreenLayout>
   );
 };

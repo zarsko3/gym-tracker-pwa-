@@ -22,8 +22,8 @@ interface Point {
 const VIEWBOX_WIDTH = 322;
 const VIEWBOX_HEIGHT = 196;
 const PADDING_X = 34;
-const PADDING_TOP = 28;
-const PADDING_BOTTOM = 60;
+const PADDING_TOP = 80;
+const PADDING_BOTTOM = 35;
 
 const createSmoothPath = (points: Point[]) => {
   if (!points.length) return '';
@@ -163,10 +163,10 @@ const DashboardWeightChart: React.FC<DashboardWeightChartProps> = ({
             style={{
               left: `${(activePoint.x / VIEWBOX_WIDTH) * 100}%`,
               top: `${(activePoint.y / VIEWBOX_HEIGHT) * 100}%`,
-              transform: 'translate(-50%, -80%)',
+              transform: 'translate(-50%, calc(-100% - 12px))',
             }}
           >
-            <div className="relative rounded-full bg-[#FAF0A1] px-5 py-1.5 text-[12px] font-bold text-[#1C132F] shadow-[0_8px_24px_rgba(250,240,161,0.35)]">
+            <div className="relative rounded-full bg-[#FAF0A1] px-5 py-2 text-[12px] font-bold text-[#1C132F] shadow-[0_8px_24px_rgba(250,240,161,0.35)] flex items-center justify-center">
               {activeValueLabel}
               <span className="absolute -bottom-[5px] left-1/2 h-[10px] w-[10px] -translate-x-1/2 rotate-45 bg-[#FAF0A1]" />
             </div>

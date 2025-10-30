@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, Plus, Minus, Play, Pause } from 'lucide-react';
+import { ChevronLeft, Plus, Minus, Play, Pause, CheckCircle } from 'lucide-react';
+import { getExercisesForWorkout, type ExerciseData } from '../../services/templates';
+import ScreenLayout from '../../components/ScreenLayout';
 
 // Custom styles for slider and other elements
 const figmaStyles = `
@@ -113,7 +115,7 @@ const figmaStyles = `
   }
 `;
 
-type WorkoutType = 'push' | 'pull' | 'legs';
+type WorkoutType = 'Push' | 'Pull' | 'Legs';
 
 interface Set {
   id: string;
@@ -126,6 +128,7 @@ interface Exercise {
   id: string;
   name: string;
   sets: Set[];
+  exerciseData: ExerciseData;
 }
 
 const WorkoutScreen: React.FC = () => {
@@ -133,7 +136,8 @@ const WorkoutScreen: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const workoutType = (searchParams.get('type') || 'push') as WorkoutType;
+  const workoutTypeParam = searchParams.get('type') || 'Push';
+  const workoutType = (workoutTypeParam.charAt(0).toUpperCase() + workoutTypeParam.slice(1).toLowerCase()) as WorkoutType;
   
   // Timer state
   const REST_PERIOD = 90; // 90 second rest timer
@@ -141,38 +145,44 @@ const WorkoutScreen: React.FC = () => {
   const [isTimerActive, setIsTimerActive] = useState(true);
   const timerRef = useRef<number | null>(null);
   
-  // Exercise data
-  const [exercises, setExercises] = useState<Exercise[]>([
-    {
-      id: '1',
-      name: 'Bench Press or Dumbbell Press',
-      sets: [{ id: '1-1', reps: 10, weight: 70, completed: false }]
-    },
-    {
-      id: '2',
-      name: 'Overhead Shoulder Press',
-      sets: [{ id: '2-1', reps: 8, weight: 50, completed: false }]
-    },
-    {
-      id: '3',
-      name: 'Incline Dumbbell Press',
-      sets: [{ id: '3-1', reps: 12, weight: 40, completed: false }]
-    },
-    {
-      id: '4',
-      name: 'Lateral Raises',
-      sets: [{ id: '4-1', reps: 15, weight: 20, completed: false }]
-    },
-    {
-      id: '5',
-      name: 'Triceps Pushdowns',
-      sets: [{ id: '5-1', reps: 12, weight: 35, completed: false }]
-    }
-  ]);
+  // Exercise data - initialize with PPL data
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   
   // Current exercise state
-  const [currentExerciseId, setCurrentExerciseId] = useState('2');
+  const [currentExerciseId, setCurrentExerciseId] = useState('1');
   const currentExercise = exercises.find(ex => ex.id === currentExerciseId) || exercises[0];
+  
+  // Loading state
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize exercises with PPL data
+  useEffect(() => {
+    console.log('Initializing exercises for workout type:', workoutType);
+    const pplExercises = getExercisesForWorkout(workoutType);
+    console.log('PPL exercises found:', pplExercises);
+    
+    if (pplExercises.length === 0) {
+      console.error('No exercises found for workout type:', workoutType);
+      setIsLoading(false);
+      return;
+    }
+    
+    const initializedExercises: Exercise[] = pplExercises.map((exerciseData, index) => ({
+      id: (index + 1).toString(),
+      name: exerciseData.name,
+      exerciseData,
+      sets: [{
+        id: `${index + 1}-1`,
+        reps: parseInt(exerciseData.reps.split('-')[0]), // Use minimum reps from range
+        weight: exerciseData.weight.min,
+        completed: false
+      }]
+    }));
+    
+    console.log('Initialized exercises:', initializedExercises);
+    setExercises(initializedExercises);
+    setIsLoading(false);
+  }, [workoutType]);
 
   // Timer effect
   useEffect(() => {
@@ -187,9 +197,9 @@ const WorkoutScreen: React.FC = () => {
         });
       }, 1000);
     } else if (timerRef.current) {
-      clearInterval(timerRef.current);
+        clearInterval(timerRef.current);
     }
-    
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -206,6 +216,16 @@ const WorkoutScreen: React.FC = () => {
 
   const handleBack = () => {
     navigate('/dashboard');
+  };
+
+  // Handle finish workout
+  const handleFinishWorkout = () => {
+    // TODO: Save workout data to database
+    // For now, just navigate to success screen or dashboard
+    const dateStr = date || new Date().toISOString().split('T')[0];
+    
+    // Navigate to workout success screen
+    navigate(`/workout-success?date=${dateStr}&type=${workoutType}`);
   };
 
   // Handle reps change for a set
@@ -236,13 +256,19 @@ const WorkoutScreen: React.FC = () => {
     setExercises(prevExercises => 
       prevExercises.map(ex => {
         if (ex.id === currentExerciseId) {
+          const exerciseData = ex.exerciseData;
+          const clampedWeight = Math.max(
+            exerciseData.weight.min, 
+            Math.min(exerciseData.weight.max, newWeight)
+          );
+          
           return {
             ...ex,
             sets: ex.sets.map(set => {
               if (set.id === setId) {
                 return {
                   ...set,
-                  weight: newWeight
+                  weight: clampedWeight
                 };
               }
               return set;
@@ -289,22 +315,33 @@ const WorkoutScreen: React.FC = () => {
     setCurrentExerciseId(exerciseId);
   };
 
+  // Show loading state while exercises are being initialized
+  if (isLoading || exercises.length === 0) {
+    return (
+      <div className="fixed inset-0 w-full h-full bg-[#1B1631] text-white overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/70">Loading {workoutType} workout...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <style>{figmaStyles}</style>
-      <div className="w-full min-h-screen bg-[var(--color-primary)] p-4 flex items-center justify-center">
-        <div className="w-[390px] h-[844px] relative text-white font-sans overflow-hidden flex flex-col" style={{ background: 'var(--color-primary)' }}>
+      <ScreenLayout>
           
           {/* 1. Header with back button and timer */}
           <header className="flex-shrink-0 grid grid-cols-12 px-6 pt-6 pb-4 items-center z-10">
             <div className="col-span-4">
-              <button
-                onClick={handleBack}
+        <button
+          onClick={handleBack}
                 className="w-[48px] h-[48px] rounded-2xl flex items-center justify-center bg-white/8 shadow-[inset_0_2px_6px_rgba(255,255,255,.06)] ring-1 ring-white/6"
                 aria-label="Go back"
-              >
+        >
                 <ChevronLeft size={24} color="white" />
-              </button>
+        </button>
             </div>
             
             {/* Timer Component */}
@@ -318,20 +355,20 @@ const WorkoutScreen: React.FC = () => {
                       {formatTime(timer)}
                     </span>
                   </div>
-                </div>
-              </div>
-            </div>
+          </div>
+        </div>
+      </div>
           </header>
 
           {/* 2. Main Content Area - Scrollable */}
           <main className="flex-1 px-6 pb-[320px] overflow-y-auto">
-            {/* Exercise Title */}
+      {/* Exercise Title */}
             <div className="text-center mb-4">
               <h1 
                 className="text-[18px] leading-tight font-extrabold tracking-[-0.2px] text-white"
               >
-                {currentExercise.name}
-              </h1>
+          {currentExercise.name}
+        </h1>
             </div>
 
             {/* Sets Section */}
@@ -369,26 +406,26 @@ const WorkoutScreen: React.FC = () => {
                       >
                         +
                       </button>
-                    </div>
-                    
+      </div>
+
                     {/* Weight Display */}
                     <div className="flex-1 flex items-baseline justify-end gap-1.5 font-mono">
                       <span className="text-white text-xl font-bold">{set.weight}</span>
                       <span className="text-white/70 text-sm font-medium">kg</span>
-                    </div>
-                  </div>
-                  
+          </div>
+        </div>
+
                   {/* Weight Slider */}
                   <div className="mt-3 px-0.5">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="100" 
-                      step="2.5"
+              <input
+                type="range"
+                      min={currentExercise.exerciseData.weight.min} 
+                      max={currentExercise.exerciseData.weight.max} 
+                      step={currentExercise.exerciseData.weight.increment}
                       value={set.weight}
-                      onChange={(e) => handleWeightChange(set.id, parseInt(e.target.value))}
+                      onChange={(e) => handleWeightChange(set.id, parseFloat(e.target.value))}
                       className="w-full h-5 appearance-none bg-white/10 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFB86C]"
-                      style={{
+                style={{
                         // Custom properties for slider styling
                         ['--track-height' as any]: '5px',
                         ['--thumb-size' as any]: '20px',
@@ -396,28 +433,40 @@ const WorkoutScreen: React.FC = () => {
                       aria-label="Weight slider"
                     />
                     <div className="flex justify-between mt-1 text-[9px] text-white/30 font-mono">
-                      <span>0</span>
-                      <span>25</span>
-                      <span>50</span>
-                      <span>75</span>
-                      <span>100</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      <span>{currentExercise.exerciseData.weight.min}</span>
+                      <span>{Math.round((currentExercise.exerciseData.weight.min + currentExercise.exerciseData.weight.max) / 4)}</span>
+                      <span>{Math.round((currentExercise.exerciseData.weight.min + currentExercise.exerciseData.weight.max) / 2)}</span>
+                      <span>{Math.round(3 * (currentExercise.exerciseData.weight.min + currentExercise.exerciseData.weight.max) / 4)}</span>
+                      <span>{currentExercise.exerciseData.weight.max}</span>
+              </div>
             </div>
-            
+          </div>
+              ))}
+      </div>
+
             {/* Add Set Button */}
             <div className="flex justify-center mt-4">
-              <button
-                onClick={addSet}
+        <button 
+          onClick={addSet}
                 className="flex items-center justify-center px-4 py-2 rounded-full bg-white text-[var(--color-primary)] font-medium transition-all hover:scale-105 hover:translate-y-[-2px] shadow-[0_4px_10px_rgba(0,0,0,0.25)]"
                 aria-label="Add set"
-              >
+        >
                 <Plus size={16} className="mr-4" />
                 <span>Add Set</span>
-              </button>
-            </div>
+        </button>
+      </div>
+
+            {/* Finish Workout Button */}
+            <div className="flex justify-center mt-6">
+        <button 
+          onClick={handleFinishWorkout}
+                className="flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-[#E8D5FF] to-[#D4C5F9] text-[#2B2440] font-bold text-base transition-all hover:scale-105 hover:shadow-[0_8px_24px_rgba(232,213,255,0.4)] shadow-[0_6px_16px_rgba(0,0,0,0.25)]"
+                aria-label="Finish workout"
+        >
+                <CheckCircle size={20} className="flex-shrink-0" />
+                <span>Finish Workout</span>
+        </button>
+      </div>
           </main>
 
           {/* 3. Bottom Sheet with Exercise List */}
@@ -428,8 +477,8 @@ const WorkoutScreen: React.FC = () => {
                 <span className="text-[#2A2E34]/60 text-[13px]">
                   {exercises.findIndex(ex => ex.id === currentExerciseId) + 1} of {exercises.length}
                 </span>
-              </div>
-              
+      </div>
+
               <div className="flex-1 overflow-y-auto exercise-list px-6 pb-4">
                 <div className="space-y-2">
                   {exercises.map(exercise => (
@@ -459,7 +508,7 @@ const WorkoutScreen: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+            </div>
             </div>
           </div>
 
@@ -479,9 +528,8 @@ const WorkoutScreen: React.FC = () => {
                 <Play size={24} color="black" />
               )}
             </button>
-          </div>
-        </div>
-      </div>
+                  </div>
+      </ScreenLayout>
     </>
   );
 };

@@ -100,7 +100,7 @@ const Settings: React.FC = () => {
         </button>
       </div>
 
-      <BottomNavigation activeTab="settings" className="mt-auto pt-10" />
+      <BottomNavigation activeTab="settings" className="flex-shrink-0 px-6 pb-6 pt-4" />
     </ScreenLayout>
   );
 };

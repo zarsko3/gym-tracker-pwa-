@@ -1,5 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Calendar as CalendarIcon, Trash2, Plus } from 'lucide-react';
 import BottomNavigation from '../../components/BottomNavigation';
 import DashboardWeightChart from '../dashboard/DashboardWeightChart';
 import ScreenLayout from '../../components/ScreenLayout';
@@ -25,10 +27,13 @@ interface CalendarDay {
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workoutData, setWorkoutData] = useState<WorkoutData[]>([]);
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [dateToDelete, setDateToDelete] = useState<string | null>(null);
 
   // Update date every minute to handle day changes
   useEffect(() => {
@@ -91,6 +96,30 @@ const Dashboard: React.FC = () => {
     });
   };
 
+  // Function to delete a workout
+  const deleteWorkout = (date: string) => {
+    setWorkoutData(prevData => prevData.filter(workout => workout.date !== date));
+  };
+
+  // Handle delete confirmation
+  const handleDeleteClick = (date: string) => {
+    setDateToDelete(date);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (dateToDelete) {
+      deleteWorkout(dateToDelete);
+      setShowDeleteConfirm(false);
+      setDateToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDateToDelete(null);
+  };
+
   // Function to get workout type for a specific date (for PPL rotation)
   const getWorkoutTypeForDate = (date: Date): WorkoutType => {
     const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
@@ -102,14 +131,16 @@ const Dashboard: React.FC = () => {
 
   // Function to handle day click
   const handleDayClick = (day: CalendarDay) => {
-    if (day.isFuture) {
-      // Show workout selection popup for future days
-      setSelectedDate(day.date);
+    // Always set selected date for displaying workout details
+    setSelectedDate(day.date);
+    
+    // For today and future days, show workout selection popup
+    if (day.isToday || day.isFuture) {
       setPopupOpen(true);
       return;
     }
     
-    // Toggle workout completion for past days
+    // For past days, toggle workout completion
     const dateStr = day.date.toISOString().split('T')[0];
     const workoutType = day.workoutType || getWorkoutTypeForDate(day.date);
     const newCompleted = !day.isCompleted;
@@ -215,53 +246,31 @@ const Dashboard: React.FC = () => {
   const activeValueLabel = `505 KG`; // Hardcoded to match Figma
 
   const getDayClasses = (day: CalendarDay) => {
-    // Today - always highlighted with pink (highest priority)
+    const baseTransition = 'transition-all duration-200 hover:scale-103 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#1F1934]';
+    
+    // Today - thicker ring + subtle glow (only show if completed)
     if (day.isToday) {
-      return 'border-0 bg-[#FAD7E0] text-[#271535] shadow-[0_8px_24px_rgba(250,215,224,0.4)]';
+      if (day.isCompleted) {
+        // Today with completed workout: soft gradient with elegant glow
+        return `border-0 bg-gradient-to-br from-[#E8D5FF] to-[#D4C5F9] text-[#2B2440] font-extrabold shadow-[0_0_20px_rgba(232,213,255,0.25),0_4px_16px_rgba(0,0,0,0.15)] cursor-pointer ${baseTransition}`;
+      } else {
+        // Today without completion: soft ring with subtle background
+        return `border-[2px] border-[#C5B3E6] bg-[#C5B3E6]/10 text-[#E8D5FF] font-extrabold shadow-[0_0_16px_rgba(197,179,230,0.2)] cursor-pointer ${baseTransition}`;
+      }
     }
     
-    // Future days - empty circles with subtle border, clickable
-    if (day.isFuture) {
-      return 'border-white/20 text-white/40 bg-transparent hover:border-white/40 hover:bg-white/5 cursor-pointer transition-all duration-200';
+    // Past/future days: only show if completed
+    if (day.isCompleted) {
+      return `border-0 bg-white/15 text-white/90 font-semibold shadow-[0_4px_12px_rgba(255,255,255,0.08)] backdrop-blur-sm cursor-pointer ${baseTransition}`;
     }
     
-    // Past days with completed workouts
-    if (day.workoutType && !day.isFuture && day.isCompleted) {
-      const workoutColors = {
-        push: 'bg-green-500 text-white',
-        pull: 'bg-blue-500 text-white',
-        legs: 'bg-purple-500 text-white',
-        rest: 'bg-gray-500 text-white',
-      };
-      
-      const baseClasses = 'border-0 shadow-[0_4px_12px_rgba(0,0,0,0.2)] cursor-pointer';
-      return `${baseClasses} ${workoutColors[day.workoutType]}`;
-    }
-    
-    // Past days with planned but not completed workouts
-    if (day.workoutType && !day.isFuture && !day.isCompleted) {
-      const workoutColors = {
-        push: 'bg-green-500/30 text-green-300 border-green-500/50',
-        pull: 'bg-blue-500/30 text-blue-300 border-blue-500/50',
-        legs: 'bg-purple-500/30 text-purple-300 border-purple-500/50',
-        rest: 'bg-gray-500/30 text-gray-300 border-gray-500/50',
-      };
-      
-      const baseClasses = 'border shadow-[0_2px_8px_rgba(0,0,0,0.1)] cursor-pointer';
-      return `${baseClasses} ${workoutColors[day.workoutType]}`;
-    }
-    
-    // Selected day (not today)
-    if (day.isSelected && !day.isToday) {
-      return 'border-white/50 text-white bg-white/10 shadow-[0_4px_12px_rgba(255,255,255,0.1)] cursor-pointer';
-    }
-    
-    // Default styling for days without workout data
-    return 'border-white/30 text-white/65 hover:border-white/50 cursor-pointer';
+    // Empty circle for all non-completed days
+    return `border border-white/15 bg-transparent text-white/60 hover:border-white/30 hover:bg-white/5 hover:text-white/80 cursor-pointer ${baseTransition}`;
   };
 
   return (
-    <ScreenLayout contentClassName="flex flex-col h-full px-6 py-6 bg-gradient-to-br from-[#2B2440] via-[#1F1934] to-[#100B1F]">
+    <ScreenLayout contentClassName="bg-gradient-to-br from-[#2B2440] via-[#1F1934] to-[#100B1F]">
+      <div className="flex-1 overflow-y-auto px-6 py-6">
       <header className="pt-4">
         <h1 className="text-[28px] font-bold leading-tight">
           {greeting}
@@ -272,7 +281,7 @@ const Dashboard: React.FC = () => {
       </header>
 
       <section className="mt-8">
-        <div className="flex justify-between mb-3">
+        <div className="flex justify-between gap-2 mb-4">
           {weekDays.map((day, index) => (
             <div 
               key={day + index} 
@@ -284,7 +293,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* First row of 7 days */}
-        <div className="flex justify-between mb-2">
+        <div className="flex justify-between gap-2 mb-4">
           {calendarDays.slice(0, 7).map((day) => (
             <button
               key={`day-${day.value}-${day.date.getMonth()}-${day.date.getDate()}`}
@@ -301,7 +310,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Second row of 7 days */}
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-2">
           {calendarDays.slice(7, 14).map((day) => (
             <button
               key={`day-${day.value}-${day.date.getMonth()}-${day.date.getDate()}`}
@@ -318,7 +327,57 @@ const Dashboard: React.FC = () => {
         </div>
       </section>
 
-      <div className="mt-10 flex-1">
+      <div className="mt-8 flex-1">
+        {/* Selected Day Workout Details */}
+        {selectedDate && (() => {
+          const dateStr = selectedDate.toISOString().split('T')[0];
+          const workout = workoutData.find(w => w.date === dateStr);
+          const hasWorkout = workout && workout.type && workout.type !== 'rest';
+          
+          if (hasWorkout) {
+            return (
+              <div className="mb-6 rounded-2xl bg-white/8 ring-1 ring-white/10 p-4 backdrop-blur">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#E8D5FF]/15 flex items-center justify-center">
+                      <CalendarIcon className="w-5 h-5 text-[#E8D5FF]" />
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold capitalize">{workout.type} Workout</p>
+                      <p className="text-white/60 text-sm">
+                        {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteClick(dateStr)}
+                    className="w-9 h-9 rounded-xl bg-red-400/15 flex items-center justify-center text-red-300 hover:bg-red-400/25 transition-colors"
+                    aria-label="Delete workout"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            );
+          } else {
+            return (
+              <div className="mb-6 rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 backdrop-blur text-center">
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-3">
+                  <CalendarIcon className="w-6 h-6 text-white/40" />
+                </div>
+                <p className="text-white/70 text-sm mb-3">No workout scheduled</p>
+                <button
+                  onClick={() => setPopupOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#E8D5FF] to-[#D4C5F9] text-[#2B2440] font-semibold hover:shadow-lg transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Workout
+                </button>
+              </div>
+            );
+          }
+        })()}
+        
         <DashboardWeightChart
           data={chartData}
           activeIndex={activeChartIndex}
@@ -327,8 +386,9 @@ const Dashboard: React.FC = () => {
           description="20 reps, 3 sets with 10 sec rest"
         />
       </div>
+      </div>
 
-      <BottomNavigation activeTab="home" className="mt-auto pt-5" />
+      <BottomNavigation activeTab="home" className="flex-shrink-0 px-6 pb-6 pt-4" />
 
       {/* Workout Selection Popup */}
       {selectedDate && (
@@ -338,6 +398,51 @@ const Dashboard: React.FC = () => {
           selectedDate={selectedDate}
           onWorkoutSelect={handleWorkoutSelect}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={cancelDelete}
+          />
+          
+          {/* Modal */}
+          <div className="relative w-full max-w-sm mx-auto transform transition-all">
+            <div className="bg-[#2B2440] rounded-3xl p-6 shadow-2xl border border-white/20 backdrop-blur-lg">
+              {/* Icon */}
+              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-6 h-6 text-red-400" />
+              </div>
+              
+              {/* Content */}
+              <h3 className="text-xl font-bold text-white text-center mb-2">
+                Delete Workout?
+              </h3>
+              <p className="text-white/70 text-sm text-center mb-6">
+                This will remove the workout from your schedule. This action cannot be undone.
+              </p>
+              
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold hover:bg-white/20 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors shadow-lg"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </ScreenLayout>
   );
